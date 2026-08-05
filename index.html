@@ -49,12 +49,6 @@
             border-radius: 20px;
         }
 
-        /*
-         * Leaflet icon wrapper.
-         *
-         * Overflow remains visible so repeated dots can be spread around
-         * the same geographic coordinate without changing the true location.
-         */
         .research-icon {
             overflow: visible !important;
             background: transparent !important;
@@ -159,10 +153,10 @@
         const EXPECTED_DOT_COUNT = 182;
 
         /*
-         * Embedded location data.
+         * Country-only records are positioned at the national capital
+         * or principal national location.
          *
-         * Each count value determines how many individual dots are created.
-         * Blank-city spreadsheet records use the relevant country coordinates.
+         * Named-city records remain at their specific city coordinates.
          */
         const locations = [
             {
@@ -201,10 +195,14 @@
                 lng: 27.9147,
                 count: 1
             },
+
+            /*
+             * Blank-city Canada entries are placed at Ottawa.
+             */
             {
                 label: "Canada",
-                lat: 56.1304,
-                lng: -106.3468,
+                lat: 45.4215,
+                lng: -75.6972,
                 count: 4
             },
             {
@@ -225,10 +223,14 @@
                 lng: -73.5674,
                 count: 5
             },
+
+            /*
+             * Blank-city China entries are placed at Beijing.
+             */
             {
                 label: "China",
-                lat: 35.8617,
-                lng: 104.1954,
+                lat: 39.9042,
+                lng: 116.4074,
                 count: 2
             },
             {
@@ -261,10 +263,14 @@
                 lng: 31.2357,
                 count: 1
             },
+
+            /*
+             * Blank-city Egypt entry is placed at Cairo.
+             */
             {
                 label: "Egypt",
-                lat: 26.8206,
-                lng: 30.8025,
+                lat: 30.0444,
+                lng: 31.2357,
                 count: 1
             },
             {
@@ -279,16 +285,24 @@
                 lng: 7.262,
                 count: 1
             },
+
+            /*
+             * Blank-city France entry is placed at Paris.
+             */
             {
                 label: "France",
-                lat: 46.2276,
-                lng: 2.2137,
+                lat: 48.8566,
+                lng: 2.3522,
                 count: 1
             },
+
+            /*
+             * Blank-city Germany entries are placed at Berlin.
+             */
             {
                 label: "Germany",
-                lat: 51.1657,
-                lng: 10.4515,
+                lat: 52.52,
+                lng: 13.405,
                 count: 2
             },
             {
@@ -321,10 +335,14 @@
                 lng: 76.7794,
                 count: 3
             },
+
+            /*
+             * Blank-city India entries are placed at New Delhi.
+             */
             {
                 label: "India",
-                lat: 20.5937,
-                lng: 78.9629,
+                lat: 28.6139,
+                lng: 77.209,
                 count: 5
             },
             {
@@ -363,10 +381,14 @@
                 lng: 14.2681,
                 count: 2
             },
+
+            /*
+             * Blank-city Italy entries are placed at Rome.
+             */
             {
                 label: "Italy",
-                lat: 41.8719,
-                lng: 12.5674,
+                lat: 41.9028,
+                lng: 12.4964,
                 count: 16
             },
             {
@@ -453,10 +475,14 @@
                 lng: -99.1332,
                 count: 1
             },
+
+            /*
+             * Blank-city Mexico entry is placed at Mexico City.
+             */
             {
                 label: "Mexico",
-                lat: 23.6345,
-                lng: -102.5528,
+                lat: 19.4326,
+                lng: -99.1332,
                 count: 1
             },
             {
@@ -465,16 +491,24 @@
                 lng: -6.8416,
                 count: 1
             },
+
+            /*
+             * Blank-city Netherlands entry is placed at Amsterdam.
+             */
             {
                 label: "Netherlands",
-                lat: 52.1326,
-                lng: 5.2913,
+                lat: 52.3676,
+                lng: 4.9041,
                 count: 1
             },
+
+            /*
+             * Blank-city New Zealand entry is placed at Wellington.
+             */
             {
                 label: "New Zealand",
-                lat: -40.9006,
-                lng: 174.886,
+                lat: -41.2866,
+                lng: 174.7756,
                 count: 1
             },
             {
@@ -501,10 +535,14 @@
                 lng: 126.978,
                 count: 2
             },
+
+            /*
+             * Blank-city Republic of Korea entries are placed at Seoul.
+             */
             {
                 label: "Republic of Korea",
-                lat: 35.9078,
-                lng: 127.7669,
+                lat: 37.5665,
+                lng: 126.978,
                 count: 3
             },
             {
@@ -513,10 +551,14 @@
                 lng: 103.8198,
                 count: 1
             },
+
+            /*
+             * Blank-city Slovenia entry is placed at Ljubljana.
+             */
             {
                 label: "Slovenia",
-                lat: 46.1512,
-                lng: 14.9955,
+                lat: 46.0569,
+                lng: 14.5058,
                 count: 1
             },
             {
@@ -537,10 +579,14 @@
                 lng: -4.0043,
                 count: 1
             },
+
+            /*
+             * Blank-city Spain entries are placed at Madrid.
+             */
             {
                 label: "Spain",
-                lat: 40.4637,
-                lng: -3.7492,
+                lat: 40.4168,
+                lng: -3.7038,
                 count: 11
             },
             {
@@ -597,16 +643,24 @@
                 lng: -4.4214,
                 count: 1
             },
+
+            /*
+             * Blank-city Sweden entry is placed at Stockholm.
+             */
             {
                 label: "Sweden",
-                lat: 60.1282,
-                lng: 18.6435,
+                lat: 59.3293,
+                lng: 18.0686,
                 count: 1
             },
+
+            /*
+             * Blank-city Turkey entry is placed at Ankara.
+             */
             {
                 label: "Turkey",
-                lat: 38.9637,
-                lng: 35.2433,
+                lat: 39.9334,
+                lng: 32.8597,
                 count: 1
             },
             {
@@ -615,10 +669,14 @@
                 lng: -5.9301,
                 count: 2
             },
+
+            /*
+             * Blank-city United Kingdom entries are placed at London.
+             */
             {
                 label: "United Kingdom",
-                lat: 55.3781,
-                lng: -3.436,
+                lat: 51.5074,
+                lng: -0.1278,
                 count: 4
             },
             {
@@ -645,10 +703,14 @@
                 lng: -74.006,
                 count: 2
             },
+
+            /*
+             * Blank-city United States entries are placed at Washington, DC.
+             */
             {
                 label: "United States",
-                lat: 39.8283,
-                lng: -98.5795,
+                lat: 38.9072,
+                lng: -77.0369,
                 count: 10
             },
             {
@@ -744,10 +806,8 @@
         }
 
         /*
-         * Returns a pixel offset for dots sharing the same coordinate.
-         *
-         * The location remains geographically correct while individual
-         * dots are visually distributed in a compact spiral.
+         * Creates a compact spiral in pixels around locations that have
+         * multiple dots at the same latitude and longitude.
          */
         function getDotOffset(index) {
             if (index === 0) {
@@ -798,9 +858,6 @@
         function addEmbeddedMarkers() {
             markerLayer.clearLayers();
 
-            /*
-             * Tracks every dot already positioned at each coordinate.
-             */
             const coordinateCounts = new Map();
 
             let totalDots = 0;
@@ -826,10 +883,6 @@
                     const offset =
                         getDotOffset(duplicateIndex);
 
-                    /*
-                     * Stagger pulse animations so nearby dots do not all
-                     * expand at the same instant.
-                     */
                     const animationDelay =
                         -((totalDots % 14) * 0.14);
 
