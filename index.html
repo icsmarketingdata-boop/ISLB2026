@@ -1,93 +1,107 @@
-
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICSES 2026 | Research Map</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        :root { 
-            --brand-charcoal: #231F20;
-            --brand-sienna: #A74424;
-            --brand-green: #67C18C;
-            --brand-teal: #4BB3A6;
-            --brand-red: #8C191B;
 
-            --bg-soft: #f5f4f2;
+    <title>ICSES 2026 | Research Map</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        crossorigin=""
+    >
+
+    <style>
+        :root {
+            --brand-charcoal: #231f20;
+            --brand-sienna: #a74424;
+            --brand-green: #67c18c;
+            --brand-teal: #4bb3a6;
+            --brand-red: #8c191b;
+
             --bg-panel: #ffffff;
             --text-muted: #6a6767;
-            --border-soft: rgba(35, 31, 32, 0.10);
+            --border-soft: rgba(35, 31, 32, 0.1);
             --shadow-soft: 0 16px 40px rgba(35, 31, 32, 0.08);
         }
-        
-        body { 
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+        }
+
+        body {
             background: linear-gradient(180deg, #f7f5f2 0%, #f1efeb 100%);
-            color: var(--brand-charcoal); 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
-            margin: 0; 
-            padding: 28px 20px 40px; 
+            color: var(--brand-charcoal);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+            padding: 28px 20px 40px;
             text-align: center;
-            min-height: 100vh;
         }
 
         .page-wrap {
+            width: 100%;
             max-width: 1280px;
             margin: 0 auto;
         }
 
-        h1 { 
-            margin: 8px 0 10px; 
-            font-weight: 800; 
-            letter-spacing: -1px; 
+        h1 {
+            margin: 8px 0 10px;
             color: var(--brand-charcoal);
             font-size: clamp(2rem, 4vw, 3.1rem);
+            font-weight: 800;
+            letter-spacing: -1px;
             line-height: 1.05;
         }
-        
-        p.subtitle {
-            opacity: 1;
+
+        .subtitle {
+            max-width: 760px;
             margin: 0 auto 30px;
-            font-size: 1.08rem;
             color: var(--text-muted);
-            max-width: 720px;
-            line-height: 1.5;
+            font-size: 1.08rem;
+            line-height: 1.55;
         }
 
         .stats-grid {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
-            margin: 0 auto 28px;
-            flex-wrap: wrap;
             max-width: 900px;
+            margin: 0 auto 28px;
         }
 
         .stat-card {
+            min-width: 240px;
+            padding: 22px 28px;
             background: var(--bg-panel);
             border: 1px solid var(--border-soft);
             border-radius: 22px;
-            padding: 22px 28px;
-            min-width: 240px;
             box-shadow: var(--shadow-soft);
         }
 
-        .num { 
-            font-size: 3rem; 
-            font-weight: 800; 
-            color: var(--brand-green); 
-            display: block; 
-            line-height: 1;
+        .num {
+            display: block;
             margin-bottom: 8px;
+            color: var(--brand-green);
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1;
         }
 
-        .label { 
-            font-size: 0.8rem; 
-            text-transform: uppercase; 
-            letter-spacing: 1.8px; 
-            color: var(--brand-charcoal); 
-            opacity: 0.8;
+        .label {
             display: block;
+            color: var(--brand-charcoal);
+            font-size: 0.8rem;
+            letter-spacing: 1.8px;
+            opacity: 0.8;
+            text-transform: uppercase;
         }
 
         .btn-container {
@@ -96,72 +110,156 @@
 
         .register-btn {
             display: inline-block;
-            background: var(--brand-sienna);
-            color: white;
             padding: 15px 34px;
+            background: var(--brand-sienna);
+            border: 0;
             border-radius: 999px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1rem;
-            border: none;
-            transition: all 0.25s ease;
             box-shadow: 0 10px 24px rgba(167, 68, 36, 0.18);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition:
+                background 0.25s ease,
+                box-shadow 0.25s ease,
+                transform 0.25s ease;
         }
 
-        .register-btn:hover { 
+        .register-btn:hover,
+        .register-btn:focus {
             background: var(--brand-teal);
-            transform: translateY(-2px);
             box-shadow: 0 12px 28px rgba(75, 179, 166, 0.22);
+            transform: translateY(-2px);
         }
 
         .map-card {
+            padding: 14px;
+            overflow: hidden;
             background: var(--bg-panel);
             border: 1px solid var(--border-soft);
             border-radius: 28px;
-            padding: 14px;
-            box-shadow: 0 20px 50px rgba(35, 31, 32, 0.10);
+            box-shadow: 0 20px 50px rgba(35, 31, 32, 0.1);
         }
 
-        #map { 
-            height: 680px; 
-            width: 100%; 
-            border-radius: 20px; 
+        #map {
+            width: 100%;
+            height: 680px;
             background: #eef2f1;
+            border-radius: 20px;
+        }
+
+        .map-loading {
+            position: absolute;
+            z-index: 500;
+            top: 24px;
+            left: 50%;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--border-soft);
+            border-radius: 999px;
+            box-shadow: 0 8px 20px rgba(35, 31, 32, 0.12);
+            color: var(--brand-charcoal);
+            font-size: 0.88rem;
+            font-weight: 700;
+            pointer-events: none;
+            transform: translateX(-50%);
+        }
+
+        .map-loading[hidden] {
+            display: none;
         }
 
         .ping-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             background: var(--brand-teal);
-            border: 2px solid white;
+            border: 2px solid #ffffff;
             border-radius: 50%;
-            animation: pulse-brand 2.4s infinite;
             box-shadow: 0 2px 8px rgba(35, 31, 32, 0.18);
+            animation: pulse-brand 2.4s infinite;
+        }
+
+        .ping-marker.has-multiple {
+            background: var(--brand-sienna);
+        }
+
+        .marker-count {
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 800;
+            line-height: 1;
         }
 
         @keyframes pulse-brand {
-            0% { box-shadow: 0 0 0 0 rgba(75, 179, 166, 0.35); }
-            70% { box-shadow: 0 0 0 12px rgba(75, 179, 166, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(75, 179, 166, 0); }
-        }
+            0% {
+                box-shadow: 0 0 0 0 rgba(75, 179, 166, 0.35);
+            }
 
-        .leaflet-tooltip { 
-            background: white !important; 
-            color: var(--brand-charcoal) !important; 
-            border: 1px solid rgba(167, 68, 36, 0.22) !important; 
-            border-radius: 12px; 
-            padding: 10px 12px; 
-            font-weight: 600;
-            box-shadow: 0 8px 20px rgba(35, 31, 32, 0.12);
-        }
+            70% {
+                box-shadow: 0 0 0 12px rgba(75, 179, 166, 0);
+            }
 
-        .leaflet-control-attribution { 
-            background: rgba(255, 255, 255, 0.88) !important; 
-            color: #666 !important; 
-            border-radius: 10px 0 0 0;
-            backdrop-filter: blur(4px);
+            100% {
+                box-shadow: 0 0 0 0 rgba(75, 179, 166, 0);
+            }
         }
 
         .leaflet-container {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                sans-serif;
+        }
+
+        .leaflet-tooltip {
+            padding: 10px 12px;
+            background: #ffffff !important;
+            border: 1px solid rgba(167, 68, 36, 0.22) !important;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(35, 31, 32, 0.12);
+            color: var(--brand-charcoal) !important;
+            font-weight: 600;
+        }
+
+        .tooltip-location {
+            display: block;
+            margin-bottom: 3px;
+            font-weight: 800;
+        }
+
+        .tooltip-count {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        .leaflet-control-attribution {
+            background: rgba(255, 255, 255, 0.88) !important;
+            border-radius: 10px 0 0;
+            color: #666666 !important;
+            backdrop-filter: blur(4px);
+        }
+
+        .leaflet-control-zoom {
+            overflow: hidden;
+            border: 0 !important;
+            border-radius: 12px !important;
+            box-shadow: 0 8px 20px rgba(35, 31, 32, 0.12) !important;
+        }
+
+        .leaflet-control-zoom a {
+            color: var(--brand-charcoal) !important;
+        }
+
+        .status-message {
+            margin: 14px auto 0;
+            color: var(--text-muted);
+            font-size: 0.86rem;
+            line-height: 1.5;
+        }
+
+        .status-message.error {
+            color: var(--brand-red);
         }
 
         @media (max-width: 900px) {
@@ -176,8 +274,8 @@
             }
 
             .stat-card {
-                min-width: unset;
                 width: 100%;
+                min-width: 0;
             }
 
             .num {
@@ -192,273 +290,671 @@
                 width: 100%;
                 max-width: 320px;
             }
+
+            .map-card {
+                padding: 8px;
+                border-radius: 20px;
+            }
+
+            #map {
+                border-radius: 15px;
+            }
         }
     </style>
 </head>
+
 <body>
+    <main class="page-wrap">
+        <h1>Global research community</h1>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <p class="subtitle">
+            Explore the cities and countries represented by researchers
+            contributing to ICSES 2026.
+        </p>
+
+        <section class="stats-grid" aria-label="Research submission statistics">
+            <div class="stat-card">
+                <span class="num" id="count-abstracts">0</span>
+                <span class="label">Submissions</span>
+            </div>
+
+            <div class="stat-card">
+                <span class="num" id="count-nations">0</span>
+                <span class="label">Countries represented</span>
+            </div>
+
+            <div class="stat-card">
+                <span class="num" id="count-locations">0</span>
+                <span class="label">Mapped locations</span>
+            </div>
+        </section>
+
+        <div class="btn-container">
+            <a class="register-btn" href="#" aria-label="Register for ICSES 2026">
+                Register now
+            </a>
+        </div>
+
+        <section class="map-card" aria-label="Interactive research map">
+            <div id="map">
+                <div class="map-loading" id="map-loading">
+                    Loading research locations…
+                </div>
+            </div>
+        </section>
+
+        <p class="status-message" id="map-status" aria-live="polite"></p>
+    </main>
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin=""
+    ></script>
+
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQyTF3WaRtgKPHTVpnZwUPUyzMwq2_GkDu0-B0A1SvGiMZwGDGCCsu52XS-tf6Cc-LyF7VPWdkB7B43/pub?output=csv';
+        const csvUrl =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyTF3WaRtgKPHTVpnZwUPUyzMwq2_GkDu0-B0A1SvGiMZwGDGCCsu52XS-tf6Cc-LyF7VPWdkB7B43/pub?output=csv";
 
-        const map = L.map('map', { 
-            center: [20, 10], 
-            zoom: 2, 
-            minZoom: 1.5, 
-            maxZoom: 8, 
-            zoomControl: false, 
-            attributionControl: true 
-        });
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        }).addTo(map);
-
+        /*
+         * Canonical city coordinates.
+         *
+         * Each city is stored once. Alternate spellings, capitalization
+         * and address-style values are handled by cityAliases below.
+         */
         const hubs = {
-    'C.A.B.A.': [-34.6037, -58.3816],
-    'Buenos Aires': [-34.6037, -58.3816],
-    'Adelaide': [-34.9285, 138.6007],
-    'Antwerpen': [51.2194, 4.4025],
-    'Fortaleza': [-3.7319, -38.5267],
-    'Varna': [43.2141, 27.9147],
-    'Ottawa': [45.4215, -75.6972],
-    'Toronto': [43.6532, -79.3832],
-    'Montreal': [45.5019, -73.5674],
-    'Montréal': [45.5019, -73.5674],
-    'Guangzhou': [23.1291, 113.2644],
-    'Shenzhen': [22.5431, 114.0579],
-    'Hangzhou': [30.2741, 120.1551],
-    'Olomouc': [49.5938, 17.2509],
-    'Cairo': [30.0444, 31.2357],
-    'Toulouse': [43.6047, 1.4442],
-    'Nice': [43.7102, 7.2620],
-    'Münster': [51.9607, 7.6261],
-    'HILDEN': [51.1679, 6.9307],
-    'Athens': [37.9838, 23.7275],
-    'ATHENS': [37.9838, 23.7275],
-    'Budapest': [47.4979, 19.0402],
-    'Chandigarh': [30.7333, 76.7794],
-    'Ahmedabad': [23.0225, 72.5714],
-    'Chennai': [13.0827, 80.2707],
-    'Bengaluru': [12.9716, 77.5946],
-    'Mumbai': [19.0760, 72.8777],
-    'Binyamina': [32.5180, 34.9458],
-    'Naples, Italy': [40.8518, 14.2681],
-    'Bagnatica': [45.6602, 9.7817],
-    'CAGLIARI': [39.2238, 9.1217],
-    'Genova': [44.4056, 8.9463],
-    'Biella': [45.5629, 8.0583],
-    'Naples': [40.8518, 14.2681],
-    'Pisa': [43.7228, 10.4017],
-    'Bologna': [44.4949, 11.3426],
-    'Parma': [44.8015, 10.3279],
-    'Bergamo': [45.6983, 9.6773],
-    'Catania': [37.5079, 15.0830],
-    'Rome': [41.9028, 12.4964],
-    'Milano': [45.4642, 9.1900],
-    'Roma': [41.9028, 12.4964],
-    'roma': [41.9028, 12.4964],
-    'Bari': [41.1171, 16.8719],
-    'Strassen': [49.6206, 6.0733],
-    'Mexico City': [19.4326, -99.1332],
-    'Rabat': [34.0209, -6.8416],
-    'Obafemi-Owode': [6.9463, 3.5050],
-    'Porto': [41.1579, -8.6291],
-    'Daegu': [35.8714, 128.6014],
-    'Seoul': [37.5665, 126.9780],
-    'Madrid': [40.4168, -3.7038],
-    'hernani': [43.2662, -1.9761],
-    'Galapagar': [40.5783, -4.0043],
-    'Granada': [37.1773, -3.5986],
-    'València': [39.4699, -0.3763],
-    'Barcelona': [41.3874, 2.1686],
-    'Vila-seca': [41.1112, 1.1477],
-    'Valencia': [39.4699, -0.3763],
-    'Majadahonda': [40.4738, -3.8718],
-    'Sabino Arana 5': [43.2630, -2.9350],
-    'Santiago de Compostela': [42.8782, -8.5448],
-    'Pamplona': [42.8125, -1.6458],
-    'MÁLAGA': [36.7213, -4.4214],
-    'Belfast': [54.5973, -5.9301],
-    'Cambridge': [52.2053, 0.1218],
-    'Colchester': [51.8959, 0.8919],
-    'London': [51.5074, -0.1278],
-    'New York': [40.7128, -74.0060],
-    'Philadelphia': [39.9526, -75.1652],
-    'Boca Raton': [26.3683, -80.1289],
-    'West Los Angeles': [34.0412, -118.4426],
-    'Porter Ranch': [34.2822, -118.5506],
-    'Madison': [43.0731, -89.4012],
-    'Minneapolis': [44.9778, -93.2650],
-    'Rochester': [43.1566, -77.6088],
-    'Chicago': [41.8781, -87.6298],
-    'Sparks': [39.5349, -119.7527]
-};
+            "C.A.B.A.": [-34.6037, -58.3816],
+            "Buenos Aires": [-34.6037, -58.3816],
 
-        function toTitleCase(str) {
-            return str
-                .toLowerCase()
-                .replace(/\b\w/g, char => char.toUpperCase());
+            "Adelaide": [-34.9285, 138.6007],
+
+            "Antwerpen": [51.2194, 4.4025],
+
+            "Fortaleza": [-3.7319, -38.5267],
+
+            "Varna": [43.2141, 27.9147],
+
+            "Ottawa": [45.4215, -75.6972],
+            "Toronto": [43.6532, -79.3832],
+            "Montreal": [45.5019, -73.5674],
+
+            "Guangzhou": [23.1291, 113.2644],
+            "Shenzhen": [22.5431, 114.0579],
+            "Hangzhou": [30.2741, 120.1551],
+
+            "Olomouc": [49.5938, 17.2509],
+
+            "Cairo": [30.0444, 31.2357],
+
+            "Toulouse": [43.6047, 1.4442],
+            "Nice": [43.7102, 7.262],
+
+            "Münster": [51.9607, 7.6261],
+            "Hilden": [51.1679, 6.9307],
+
+            "Athens": [37.9838, 23.7275],
+
+            "Budapest": [47.4979, 19.0402],
+
+            "Chandigarh": [30.7333, 76.7794],
+            "Ahmedabad": [23.0225, 72.5714],
+            "Chennai": [13.0827, 80.2707],
+            "Bengaluru": [12.9716, 77.5946],
+            "Mumbai": [19.076, 72.8777],
+
+            "Binyamina": [32.518, 34.9458],
+
+            "Naples": [40.8518, 14.2681],
+            "Bagnatica": [45.6602, 9.7817],
+            "Cagliari": [39.2238, 9.1217],
+            "Genova": [44.4056, 8.9463],
+            "Biella": [45.5629, 8.0583],
+            "Pisa": [43.7228, 10.4017],
+            "Bologna": [44.4949, 11.3426],
+            "Parma": [44.8015, 10.3279],
+            "Bergamo": [45.6983, 9.6773],
+            "Catania": [37.5079, 15.083],
+            "Rome": [41.9028, 12.4964],
+            "Milan": [45.4642, 9.19],
+            "Bari": [41.1171, 16.8719],
+
+            "Strassen": [49.6206, 6.0733],
+
+            "Mexico City": [19.4326, -99.1332],
+
+            "Rabat": [34.0209, -6.8416],
+
+            "Obafemi-Owode": [6.9463, 3.505],
+
+            "Porto": [41.1579, -8.6291],
+
+            "Daegu": [35.8714, 128.6014],
+            "Seoul": [37.5665, 126.978],
+
+            "Madrid": [40.4168, -3.7038],
+            "Hernani": [43.2662, -1.9761],
+            "Galapagar": [40.5783, -4.0043],
+            "Granada": [37.1773, -3.5986],
+            "Valencia": [39.4699, -0.3763],
+            "Barcelona": [41.3874, 2.1686],
+            "Vila-seca": [41.1112, 1.1477],
+            "Majadahonda": [40.4738, -3.8718],
+            "Bilbao": [43.263, -2.935],
+            "Santiago de Compostela": [42.8782, -8.5448],
+            "Pamplona": [42.8125, -1.6458],
+            "Málaga": [36.7213, -4.4214],
+
+            "Belfast": [54.5973, -5.9301],
+            "Cambridge": [52.2053, 0.1218],
+            "Colchester": [51.8959, 0.8919],
+            "London": [51.5074, -0.1278],
+
+            "New York": [40.7128, -74.006],
+            "Philadelphia": [39.9526, -75.1652],
+            "Boca Raton": [26.3683, -80.1289],
+            "West Los Angeles": [34.0412, -118.4426],
+            "Porter Ranch": [34.2822, -118.5506],
+            "Madison": [43.0731, -89.4012],
+            "Minneapolis": [44.9778, -93.265],
+            "Rochester": [43.1566, -77.6088],
+            "Chicago": [41.8781, -87.6298],
+            "Sparks": [39.5349, -119.7527]
+        };
+
+        /*
+         * Fallback coordinates for rows where a country is supplied but
+         * the city field is blank.
+         *
+         * These are representative country-level map positions and are
+         * labelled as country-level locations in the tooltip.
+         */
+        const countryFallbacks = {
+            "Canada": [56.1304, -106.3468],
+            "China": [35.8617, 104.1954],
+            "Egypt": [26.8206, 30.8025],
+            "France": [46.2276, 2.2137],
+            "Germany": [51.1657, 10.4515],
+            "India": [20.5937, 78.9629],
+            "Italy": [41.8719, 12.5674],
+            "Mexico": [23.6345, -102.5528],
+            "Netherlands": [52.1326, 5.2913],
+            "New Zealand": [-40.9006, 174.886],
+            "Republic of Korea": [35.9078, 127.7669],
+            "Singapore": [1.3521, 103.8198],
+            "Slovenia": [46.1512, 14.9955],
+            "Spain": [40.4637, -3.7492],
+            "Sweden": [60.1282, 18.6435],
+            "Turkey": [38.9637, 35.2433],
+            "United Kingdom": [55.3781, -3.436],
+            "United States": [39.8283, -98.5795]
+        };
+
+        /*
+         * City aliases are stored using normalized lowercase keys.
+         *
+         * normalizeLookupText() removes accents, punctuation differences
+         * and inconsistent spacing before checking this object.
+         */
+        const cityAliases = {
+            "c a b a": "C.A.B.A.",
+            "capital federal": "C.A.B.A.",
+
+            "montreal": "Montreal",
+
+            "munster": "Münster",
+            "hilden": "Hilden",
+
+            "athens": "Athens",
+
+            "naples italy": "Naples",
+            "napoli": "Naples",
+            "cagliari": "Cagliari",
+            "milano": "Milan",
+            "roma": "Rome",
+
+            "hernani": "Hernani",
+            "valencia": "Valencia",
+            "valencia spain": "Valencia",
+            "vila seca": "Vila-seca",
+            "malaga": "Málaga",
+
+            "sabino arana 5": "Bilbao",
+
+            "west los angeles": "West Los Angeles"
+        };
+
+        const map = L.map("map", {
+            center: [20, 10],
+            zoom: 2,
+            minZoom: 1,
+            maxZoom: 9,
+            zoomControl: true,
+            attributionControl: true,
+            worldCopyJump: true
+        });
+
+        L.tileLayer(
+            "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+            {
+                attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: "abcd",
+                maxZoom: 20
+            }
+        ).addTo(map);
+
+        const markerLayer = L.layerGroup().addTo(map);
+
+        function normalizeLookupText(value) {
+            return String(value || "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[’']/g, "")
+                .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim()
+                .toLowerCase();
         }
 
-        function normalizeCity(city, country = '') {
-            if (!city) return '';
+        function createCanonicalCityLookup() {
+            const lookup = {};
 
-            city = city.trim().replace(/\s+/g, ' ');
-            const countryNormalized = (country || '').trim().toLowerCase();
+            Object.keys(hubs).forEach((city) => {
+                lookup[normalizeLookupText(city)] = city;
+            });
 
-            const aliasMap = {
-                'Montréal': 'Montreal',
-                'Zürich': 'Zurich',
-                'Toyko': 'Tokyo',
-                'St Louis': 'St. Louis',
-                'Saint Louis': 'St. Louis',
-                'St Catharines': 'St. Catharines',
-                'Sao Paulo': 'São Paulo',
-                'Bogota': 'Bogotá',
-                'Brasilia': 'Brasília',
-                'Lisboa': 'Lisbon',
-                'Busam': 'Busan',
-                'Osaka-city': 'Osaka',
-                'Yokohama, Kanagawa': 'Yokohama',
-                'Hamamatsu, Shizuoka': 'Hamamatsu',
-                'Hamamatsu Tyuuouku': 'Hamamatsu',
-                'Funabashi Chiba': 'Funabashi',
-                'Funabashi ,Chiba': 'Funabashi',
-                'Funabashi, Chiba': 'Funabashi',
-                'Shinjuku-ku, Tokyo': 'Tokyo',
-                'Hachioji, Tokyo': 'Tokyo',
-                'Aoba-ku, Sendai': 'Sendai',
-                'Ayabe-shi, Kyoto': 'Kyoto',
-                'Kyotanabe, Kyoto': 'Kyoto',
-                'Kogarah, NSW': 'Kogarah',
-                'Ansan-si, Gyeonggi-do': 'Ansan',
-                'Bucheon-si, Gyeonggi-do': 'Bucheon',
-                'Pohang-si, Nam-gu': 'Pohang',
-                'Yeosu-si': 'Yeosu',
-                'Goyang-si': 'Goyang',
-                'Goyang-sI': 'Goyang',
-                'Seongnam-si': 'Seongnam',
-                'Seong Nam': 'Seongnam',
-                'Sungnamsi': 'Seongnam',
-                'Sejong-si': 'Sejong',
-                'lyon': 'Lyon',
-                'LYON': 'Lyon',
-                'paris': 'Paris',
-                'london': 'London',
-                'kyoto': 'Kyoto',
-                'brisbane': 'Brisbane',
-                'durham': 'Durham',
-                'hyderabad': 'Hyderabad',
-                'khobar': 'Al Khobar',
-                'AlShuhada': 'Kuwait City',
-                'MEDELLIN': 'Medellin',
-                'ZARAGOZA': 'Zaragoza',
-                'VALENCIA': 'Valencia',
-                'IZMIR': 'Izmir',
-                'JOINVILLE': 'Joinville',
-                'BUFFALO': 'Buffalo',
-                'MUMBAI': 'Mumbai',
-                'DURBAN': 'Durban',
-                'GWANGJU': 'Gwangju',
-                'TOURS': 'Tours',
-                'CUIDAD DE MEXICO': 'Mexico City',
-                'Ciudad de Mexico': 'Mexico City',
-                'Ciudad de México': 'Mexico City',
-                'las condes, santiago': 'Santiago',
-                'Las Condes, Santiago': 'Santiago',
-                'viña del mar': 'Viña del Mar',
-                'petah Tikva': 'Petah Tikva',
-                'Panamá': 'Panama City',
-                'Berne': 'Bern',
-                'Milano': 'Milan',
-                'Roma': 'Rome',
-                'Napoli': 'Naples',
-                'latina': 'Latina',
-                'higashiosaka': 'Higashiosaka',
-                'chihuahua': 'Chihuahua',
-                'doha': 'Doha',
-                'derby': 'Derby',
-                'clayton': 'Clayton',
-                'toulouse': 'Toulouse',
-                'quito': 'Quito',
-                'Santo André - SP': 'Santo André',
-                'Jaragua do Sul': 'Jaraguá do Sul',
-                'CAPITAL FEDERAL': 'Capital Federal'
+            return lookup;
+        }
+
+        const canonicalCityLookup = createCanonicalCityLookup();
+
+        function normalizeCountry(country) {
+            const cleaned = String(country || "")
+                .trim()
+                .replace(/\s+/g, " ");
+
+            const normalized = normalizeLookupText(cleaned);
+
+            const aliases = {
+                "republic of korea": "Republic of Korea",
+                "south korea": "Republic of Korea",
+                "korea republic of": "Republic of Korea",
+                "uk": "United Kingdom",
+                "u k": "United Kingdom",
+                "usa": "United States",
+                "u s a": "United States",
+                "united states of america": "United States"
             };
 
-            if (aliasMap[city]) return aliasMap[city];
+            if (aliases[normalized]) {
+                return aliases[normalized];
+            }
 
-            if (/^.+,\s*Tokyo$/i.test(city)) return 'Tokyo';
-            if (/^.+,\s*Kyoto$/i.test(city)) return 'Kyoto';
-            if (/^.+,\s*Chiba$/i.test(city)) return 'Funabashi';
-            if (/^.+,\s*Shizuoka$/i.test(city)) return 'Hamamatsu';
-            if (/^.+,\s*Kanagawa$/i.test(city)) return 'Yokohama';
-            if (/^.+,\s*Victoria$/i.test(city) && countryNormalized === 'australia') return 'Melbourne';
-            if (/^.+,\s*Gyeonggi-do$/i.test(city)) return 'Ansan';
-            if (/^.+,\s*Santiago$/i.test(city)) return 'Santiago';
-            if (/^.+,\s*Chih\.$/i.test(city)) return 'Chihuahua';
+            return cleaned;
+        }
 
-            const titleCased = toTitleCase(city);
+        function normalizeCity(city) {
+            const cleaned = String(city || "")
+                .trim()
+                .replace(/\s+/g, " ");
 
-            if (aliasMap[titleCased]) return aliasMap[titleCased];
+            if (!cleaned) {
+                return "";
+            }
 
-            return titleCased;
+            const lookupKey = normalizeLookupText(cleaned);
+
+            if (cityAliases[lookupKey]) {
+                return cityAliases[lookupKey];
+            }
+
+            if (canonicalCityLookup[lookupKey]) {
+                return canonicalCityLookup[lookupKey];
+            }
+
+            return cleaned;
+        }
+
+        /*
+         * Parses quoted CSV values, including commas inside quoted cells.
+         */
+        function parseCSV(csvText) {
+            const rows = [];
+            let row = [];
+            let value = "";
+            let insideQuotes = false;
+
+            for (let i = 0; i < csvText.length; i++) {
+                const character = csvText[i];
+                const nextCharacter = csvText[i + 1];
+
+                if (character === '"' && insideQuotes && nextCharacter === '"') {
+                    value += '"';
+                    i++;
+                    continue;
+                }
+
+                if (character === '"') {
+                    insideQuotes = !insideQuotes;
+                    continue;
+                }
+
+                if (character === "," && !insideQuotes) {
+                    row.push(value.trim());
+                    value = "";
+                    continue;
+                }
+
+                if (
+                    (character === "\n" || character === "\r") &&
+                    !insideQuotes
+                ) {
+                    if (character === "\r" && nextCharacter === "\n") {
+                        i++;
+                    }
+
+                    row.push(value.trim());
+
+                    if (row.some((cell) => cell !== "")) {
+                        rows.push(row);
+                    }
+
+                    row = [];
+                    value = "";
+                    continue;
+                }
+
+                value += character;
+            }
+
+            row.push(value.trim());
+
+            if (row.some((cell) => cell !== "")) {
+                rows.push(row);
+            }
+
+            return rows;
+        }
+
+        function escapeHTML(value) {
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function createMarkerIcon(count) {
+            const markerSize =
+                count >= 10 ? 28 :
+                count >= 5 ? 24 :
+                count > 1 ? 20 :
+                14;
+
+            const showCount = count > 1;
+
+            return L.divIcon({
+                className: "",
+                html: `
+                    <div
+                        class="ping-marker ${showCount ? "has-multiple" : ""}"
+                        style="width:${markerSize}px;height:${markerSize}px;"
+                        aria-hidden="true"
+                    >
+                        ${
+                            showCount
+                                ? `<span class="marker-count">${count}</span>`
+                                : ""
+                        }
+                    </div>
+                `,
+                iconSize: [markerSize, markerSize],
+                iconAnchor: [markerSize / 2, markerSize / 2],
+                tooltipAnchor: [0, -(markerSize / 2 + 4)]
+            });
+        }
+
+        function getLocationRecord(city, country) {
+            const normalizedCountry = normalizeCountry(country);
+            const normalizedCity = normalizeCity(city);
+
+            if (normalizedCity && hubs[normalizedCity]) {
+                return {
+                    key: `city:${normalizedCity}|${normalizedCountry}`,
+                    city: normalizedCity,
+                    country: normalizedCountry,
+                    label: normalizedCountry
+                        ? `${normalizedCity}, ${normalizedCountry}`
+                        : normalizedCity,
+                    coordinates: hubs[normalizedCity],
+                    isCountryFallback: false
+                };
+            }
+
+            if (!normalizedCity && countryFallbacks[normalizedCountry]) {
+                return {
+                    key: `country:${normalizedCountry}`,
+                    city: "",
+                    country: normalizedCountry,
+                    label: normalizedCountry,
+                    coordinates: countryFallbacks[normalizedCountry],
+                    isCountryFallback: true
+                };
+            }
+
+            return null;
+        }
+
+        function updateStatistics(submissions, countries, locations) {
+            document.getElementById("count-abstracts").textContent =
+                submissions.toLocaleString();
+
+            document.getElementById("count-nations").textContent =
+                countries.toLocaleString();
+
+            document.getElementById("count-locations").textContent =
+                locations.toLocaleString();
+        }
+
+        function setStatus(message, isError = false) {
+            const statusElement = document.getElementById("map-status");
+
+            statusElement.textContent = message;
+            statusElement.classList.toggle("error", isError);
+        }
+
+        function hideLoadingIndicator() {
+            document.getElementById("map-loading").hidden = true;
         }
 
         async function loadData() {
+            markerLayer.clearLayers();
+            setStatus("");
+
             try {
-                const res = await fetch(csvUrl);
-                if (!res.ok) throw new Error('Could not fetch CSV');
-                
-                const csv = await res.text();
-                const lines = csv.split(/\r?\n/).filter(line => line.trim() !== '');
-                const dataRows = lines.slice(1);
-                
-                const countries = new Set();
-                const processedCities = new Set(); 
-                let submissions = 0;
-
-                dataRows.forEach(line => {
-                    const cols = line
-                        .split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-                        .map(c => c.trim().replace(/^"|"$/g, ''));
-
-                    let city = cols[0] || '';
-                    const country = cols[1] || '';
-
-                    if (!city && !country) return;
-                    
-                    submissions++;
-                    if (country) countries.add(country);
-
-                    city = normalizeCity(city, country);
-
-                    if (hubs[city] && !processedCities.has(city)) {
-                        const icon = L.divIcon({
-                            className: 'ping-marker',
-                            iconSize: [12, 12]
-                        });
-
-                        L.marker(hubs[city], { icon }).addTo(map)
-                            .bindTooltip(`${city}, ${country}`, {
-                                direction: 'top',
-                                offset: [0, -8]
-                            });
-
-                        processedCities.add(city);
-                    }
+                const response = await fetch(csvUrl, {
+                    cache: "no-store"
                 });
 
-                document.getElementById('count-abstracts').innerText = submissions.toLocaleString();
-                document.getElementById('count-nations').innerText = countries.size;
+                if (!response.ok) {
+                    throw new Error(
+                        `The spreadsheet returned status ${response.status}.`
+                    );
+                }
 
-            } catch (e) { 
-                console.error('Error loading CSV data:', e); 
+                const csvText = await response.text();
+                const rows = parseCSV(csvText);
+
+                if (rows.length < 2) {
+                    throw new Error(
+                        "The spreadsheet does not contain any submission rows."
+                    );
+                }
+
+                /*
+                 * The first row is treated as the spreadsheet header.
+                 * Column 1 is expected to contain city.
+                 * Column 2 is expected to contain country.
+                 */
+                const dataRows = rows.slice(1);
+
+                const countries = new Set();
+                const locations = new Map();
+                const unmatchedLocations = new Map();
+
+                let submissions = 0;
+
+                dataRows.forEach((columns) => {
+                    const rawCity = columns[0] || "";
+                    const rawCountry = columns[1] || "";
+
+                    if (!rawCity.trim() && !rawCountry.trim()) {
+                        return;
+                    }
+
+                    submissions++;
+
+                    const country = normalizeCountry(rawCountry);
+
+                    if (country) {
+                        countries.add(country);
+                    }
+
+                    const location = getLocationRecord(rawCity, rawCountry);
+
+                    if (!location) {
+                        const unmatchedKey =
+                            `${rawCity.trim() || "(blank city)"}, ` +
+                            `${country || "(blank country)"}`;
+
+                        unmatchedLocations.set(
+                            unmatchedKey,
+                            (unmatchedLocations.get(unmatchedKey) || 0) + 1
+                        );
+
+                        return;
+                    }
+
+                    if (!locations.has(location.key)) {
+                        locations.set(location.key, {
+                            ...location,
+                            count: 0
+                        });
+                    }
+
+                    locations.get(location.key).count++;
+                });
+
+                const markerBounds = [];
+
+                locations.forEach((location) => {
+                    const countLabel =
+                        location.count === 1
+                            ? "1 submission"
+                            : `${location.count.toLocaleString()} submissions`;
+
+                    const locationNote = location.isCountryFallback
+                        ? "City not provided"
+                        : countLabel;
+
+                    const tooltipContent = `
+                        <span class="tooltip-location">
+                            ${escapeHTML(location.label)}
+                        </span>
+                        <span class="tooltip-count">
+                            ${
+                                location.isCountryFallback
+                                    ? `${escapeHTML(locationNote)} · ${escapeHTML(countLabel)}`
+                                    : escapeHTML(countLabel)
+                            }
+                        </span>
+                    `;
+
+                    L.marker(location.coordinates, {
+                        icon: createMarkerIcon(location.count),
+                        keyboard: true,
+                        title: `${location.label}: ${countLabel}`
+                    })
+                        .addTo(markerLayer)
+                        .bindTooltip(tooltipContent, {
+                            direction: "top",
+                            offset: [0, -6],
+                            opacity: 1
+                        });
+
+                    markerBounds.push(location.coordinates);
+                });
+
+                updateStatistics(
+                    submissions,
+                    countries.size,
+                    locations.size
+                );
+
+                if (markerBounds.length > 0) {
+                    const bounds = L.latLngBounds(markerBounds);
+
+                    map.fitBounds(bounds, {
+                        padding: [35, 35],
+                        maxZoom: 4
+                    });
+                }
+
+                if (unmatchedLocations.size > 0) {
+                    console.group(
+                        "Research map: locations that could not be mapped"
+                    );
+
+                    unmatchedLocations.forEach((count, location) => {
+                        console.warn(`${location} — ${count} record(s)`);
+                    });
+
+                    console.groupEnd();
+
+                    const unmatchedCount = Array.from(
+                        unmatchedLocations.values()
+                    ).reduce((total, count) => total + count, 0);
+
+                    setStatus(
+                        `${locations.size} locations mapped. ` +
+                        `${unmatchedCount} record${
+                            unmatchedCount === 1 ? "" : "s"
+                        } could not be mapped because the city or country was not recognised.`
+                    );
+                } else {
+                    setStatus(
+                        `${locations.size} locations mapped across ` +
+                        `${countries.size} countries.`
+                    );
+                }
+            } catch (error) {
+                console.error("Error loading research map data:", error);
+
+                updateStatistics(0, 0, 0);
+
+                setStatus(
+                    "The research location data could not be loaded. " +
+                    "Confirm that the Google Sheet is published as a CSV and allows public access.",
+                    true
+                );
+            } finally {
+                hideLoadingIndicator();
+
+                /*
+                 * Ensures Leaflet recalculates the map dimensions when the
+                 * code is embedded in a page builder or initially hidden tab.
+                 */
+                window.setTimeout(() => {
+                    map.invalidateSize();
+                }, 150);
             }
         }
-        
+
         loadData();
-    </script>  
+
+        window.addEventListener("resize", () => {
+            map.invalidateSize();
+        });
+    </script>
 </body>
 </html>
