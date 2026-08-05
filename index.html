@@ -18,6 +18,7 @@
     <style>
         :root {
             --marker-colour: #077F9C;
+            --marker-shadow: rgba(7, 127, 156, 0.45);
         }
 
         * {
@@ -54,29 +55,33 @@
             background: var(--marker-colour);
             border: 2px solid #ffffff;
             border-radius: 50%;
-            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
+            box-shadow:
+                0 0 0 3px rgba(7, 127, 156, 0.14),
+                0 3px 9px var(--marker-shadow);
         }
 
         .leaflet-tooltip {
             padding: 8px 11px;
             background: #ffffff !important;
-            border: 1px solid rgba(7, 127, 156, 0.3) !important;
+            border: 1px solid rgba(7, 127, 156, 0.35) !important;
             border-radius: 8px;
-            box-shadow: 0 7px 18px rgba(0, 0, 0, 0.14);
+            box-shadow:
+                0 0 0 2px rgba(7, 127, 156, 0.08),
+                0 6px 18px rgba(7, 127, 156, 0.25);
             color: #231f20 !important;
             font-size: 13px;
             font-weight: 600;
         }
 
         .leaflet-tooltip-top::before {
-            border-top-color: rgba(7, 127, 156, 0.3) !important;
+            border-top-color: rgba(7, 127, 156, 0.35) !important;
         }
 
         .leaflet-control-zoom {
             overflow: hidden;
             border: 0 !important;
             border-radius: 10px !important;
-            box-shadow: 0 5px 16px rgba(0, 0, 0, 0.15) !important;
+            box-shadow: 0 5px 16px rgba(7, 127, 156, 0.25) !important;
         }
 
         .leaflet-control-zoom a {
@@ -112,36 +117,59 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
+        const EXPECTED_LOCATION_COUNT = 182;
+
         const csvUrl =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyTF3WaRtgKPHTVpnZwUPUyzMwq2_GkDu0-B0A1SvGiMZwGDGCCsu52XS-tf6Cc-LyF7VPWdkB7B43/pub?output=csv";
 
+        /*
+         * City coordinates.
+         *
+         * Sabino Arana 5 is treated as Bilbao because it is an address
+         * rather than a city name.
+         */
         const hubs = {
             "C.A.B.A.": [-34.6037, -58.3816],
             "Buenos Aires": [-34.6037, -58.3816],
+
             "Adelaide": [-34.9285, 138.6007],
+
             "Antwerpen": [51.2194, 4.4025],
+
             "Fortaleza": [-3.7319, -38.5267],
+
             "Varna": [43.2141, 27.9147],
+
             "Ottawa": [45.4215, -75.6972],
             "Toronto": [43.6532, -79.3832],
             "Montreal": [45.5019, -73.5674],
+
             "Guangzhou": [23.1291, 113.2644],
             "Shenzhen": [22.5431, 114.0579],
             "Hangzhou": [30.2741, 120.1551],
+
             "Olomouc": [49.5938, 17.2509],
+
             "Cairo": [30.0444, 31.2357],
+
             "Toulouse": [43.6047, 1.4442],
             "Nice": [43.7102, 7.262],
+
             "Münster": [51.9607, 7.6261],
             "Hilden": [51.1679, 6.9307],
+
             "Athens": [37.9838, 23.7275],
+
             "Budapest": [47.4979, 19.0402],
+
             "Chandigarh": [30.7333, 76.7794],
             "Ahmedabad": [23.0225, 72.5714],
             "Chennai": [13.0827, 80.2707],
             "Bengaluru": [12.9716, 77.5946],
             "Mumbai": [19.076, 72.8777],
+
             "Binyamina": [32.518, 34.9458],
+
             "Naples": [40.8518, 14.2681],
             "Bagnatica": [45.6602, 9.7817],
             "Cagliari": [39.2238, 9.1217],
@@ -155,13 +183,20 @@
             "Rome": [41.9028, 12.4964],
             "Milan": [45.4642, 9.19],
             "Bari": [41.1171, 16.8719],
+
             "Strassen": [49.6206, 6.0733],
+
             "Mexico City": [19.4326, -99.1332],
+
             "Rabat": [34.0209, -6.8416],
+
             "Obafemi-Owode": [6.9463, 3.505],
+
             "Porto": [41.1579, -8.6291],
+
             "Daegu": [35.8714, 128.6014],
             "Seoul": [37.5665, 126.978],
+
             "Madrid": [40.4168, -3.7038],
             "Hernani": [43.2662, -1.9761],
             "Galapagar": [40.5783, -4.0043],
@@ -174,10 +209,12 @@
             "Santiago de Compostela": [42.8782, -8.5448],
             "Pamplona": [42.8125, -1.6458],
             "Málaga": [36.7213, -4.4214],
+
             "Belfast": [54.5973, -5.9301],
             "Cambridge": [52.2053, 0.1218],
             "Colchester": [51.8959, 0.8919],
             "London": [51.5074, -0.1278],
+
             "New York": [40.7128, -74.006],
             "Philadelphia": [39.9526, -75.1652],
             "Boca Raton": [26.3683, -80.1289],
@@ -190,17 +227,36 @@
             "Sparks": [39.5349, -119.7527]
         };
 
+        /*
+         * Country coordinates are used only when the city field is blank.
+         *
+         * These positions represent the approximate geographic centre
+         * of each country.
+         */
         const countryFallbacks = {
+            "Argentina": [-38.4161, -63.6167],
+            "Australia": [-25.2744, 133.7751],
+            "Belgium": [50.5039, 4.4699],
+            "Brazil": [-14.235, -51.9253],
+            "Bulgaria": [42.7339, 25.4858],
             "Canada": [56.1304, -106.3468],
             "China": [35.8617, 104.1954],
+            "Czech Republic": [49.8175, 15.473],
             "Egypt": [26.8206, 30.8025],
             "France": [46.2276, 2.2137],
             "Germany": [51.1657, 10.4515],
+            "Greece": [39.0742, 21.8243],
+            "Hungary": [47.1625, 19.5033],
             "India": [20.5937, 78.9629],
+            "Israel": [31.0461, 34.8516],
             "Italy": [41.8719, 12.5674],
+            "Luxembourg": [49.8153, 6.1296],
             "Mexico": [23.6345, -102.5528],
+            "Morocco": [31.7917, -7.0926],
             "Netherlands": [52.1326, 5.2913],
             "New Zealand": [-40.9006, 174.886],
+            "Nigeria": [9.082, 8.6753],
+            "Portugal": [39.3999, -8.2245],
             "Republic of Korea": [35.9078, 127.7669],
             "Singapore": [1.3521, 103.8198],
             "Slovenia": [46.1512, 14.9955],
@@ -214,20 +270,27 @@
         const cityAliases = {
             "c a b a": "C.A.B.A.",
             "capital federal": "C.A.B.A.",
+
             "montreal": "Montreal",
+
             "munster": "Münster",
             "hilden": "Hilden",
+
             "athens": "Athens",
+
             "naples italy": "Naples",
             "napoli": "Naples",
             "cagliari": "Cagliari",
             "milano": "Milan",
             "roma": "Rome",
+
             "hernani": "Hernani",
             "valencia": "Valencia",
             "vila seca": "Vila-seca",
             "malaga": "Málaga",
+
             "sabino arana 5": "Bilbao",
+
             "west los angeles": "West Los Angeles"
         };
 
@@ -287,8 +350,12 @@
                 "republic of korea": "Republic of Korea",
                 "south korea": "Republic of Korea",
                 "korea republic of": "Republic of Korea",
+
+                "czechia": "Czech Republic",
+
                 "uk": "United Kingdom",
                 "u k": "United Kingdom",
+
                 "usa": "United States",
                 "u s a": "United States",
                 "united states of america": "United States"
@@ -417,7 +484,7 @@
                 };
             }
 
-            if (!city && countryFallbacks[country]) {
+            if (country && countryFallbacks[country]) {
                 return {
                     coordinates: countryFallbacks[country],
                     label: country
@@ -427,21 +494,26 @@
             return null;
         }
 
+        /*
+         * Moves duplicate markers into compact circular rings around the
+         * original location so every record remains individually visible.
+         */
         function createOffsetCoordinates(
             coordinates,
             duplicateIndex
         ) {
             if (duplicateIndex === 0) {
-                return coordinates;
+                return [...coordinates];
             }
 
             const originalLatitude = coordinates[0];
             const originalLongitude = coordinates[1];
 
             /*
-             * Arrange repeated locations in expanding circular rings.
+             * Eight dots per ring provides clearer spacing than ten dots
+             * while keeping the group close to its correct location.
              */
-            const dotsPerRing = 10;
+            const dotsPerRing = 8;
 
             const ring =
                 Math.floor(
@@ -457,19 +529,20 @@
                 2;
 
             /*
-             * Approximate offset in geographic degrees.
-             * Increase this value to spread repeated dots farther apart.
+             * Approximately 2–3 kilometres for the first ring.
              */
-            const radius = 0.035 * ring;
+            const radius = 0.025 * ring;
 
             const latitudeOffset =
                 Math.sin(angle) * radius;
 
             const longitudeCorrection = Math.max(
-                Math.cos(
-                    originalLatitude *
-                    Math.PI /
-                    180
+                Math.abs(
+                    Math.cos(
+                        originalLatitude *
+                        Math.PI /
+                        180
+                    )
                 ),
                 0.25
             );
@@ -507,20 +580,24 @@
                     );
                 }
 
+                /*
+                 * The first row is treated as a heading row.
+                 */
                 const dataRows = rows.slice(1);
+
                 const mapBounds = [];
                 const unmatchedLocations = [];
-
-                /*
-                 * Tracks repeated coordinates so each record can be shown
-                 * as a separate dot.
-                 */
                 const coordinateCounts = new Map();
 
-                dataRows.forEach((columns) => {
+                let markerCount = 0;
+
+                dataRows.forEach((columns, rowIndex) => {
                     const rawCity = columns[0] || "";
                     const rawCountry = columns[1] || "";
 
+                    /*
+                     * Ignore completely blank spreadsheet rows.
+                     */
                     if (
                         !rawCity.trim() &&
                         !rawCountry.trim()
@@ -535,6 +612,7 @@
 
                     if (!location) {
                         unmatchedLocations.push({
+                            row: rowIndex + 2,
                             city: rawCity,
                             country: rawCountry
                         });
@@ -586,7 +664,9 @@
                     );
 
                     marker.addTo(markerLayer);
+
                     mapBounds.push(displayedCoordinates);
+                    markerCount++;
                 });
 
                 if (mapBounds.length > 0) {
@@ -599,19 +679,32 @@
                     );
                 }
 
+                console.info(
+                    `Research map created ${markerCount} markers.`
+                );
+
+                if (markerCount === EXPECTED_LOCATION_COUNT) {
+                    console.info(
+                        `All ${EXPECTED_LOCATION_COUNT} expected locations were mapped successfully.`
+                    );
+                } else {
+                    console.warn(
+                        `Expected ${EXPECTED_LOCATION_COUNT} markers, but ${markerCount} were created.`
+                    );
+                }
+
                 if (unmatchedLocations.length > 0) {
                     console.group(
                         "Research map: locations that could not be mapped"
                     );
 
-                    unmatchedLocations.forEach(
-                        (location) => {
-                            console.warn(
-                                `${location.city || "(blank city)"}, ` +
-                                `${location.country || "(blank country)"}`
-                            );
-                        }
-                    );
+                    unmatchedLocations.forEach((location) => {
+                        console.warn(
+                            `Row ${location.row}: ` +
+                            `${location.city || "(blank city)"}, ` +
+                            `${location.country || "(blank country)"}`
+                        );
+                    });
 
                     console.groupEnd();
                 }
