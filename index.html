@@ -18,7 +18,6 @@
     <style>
         :root {
             --marker-colour: #077F9C;
-            --marker-shadow: rgba(7, 127, 156, 0.5);
         }
 
         * {
@@ -45,20 +44,48 @@
             width: 100%;
             height: 400px;
             min-height: 400px;
+            overflow: hidden;
             background: #eef2f1;
             border-radius: 20px;
-            overflow: hidden;
         }
 
+        /*
+         * Each spreadsheet dot.
+         */
         .research-marker {
+            position: relative;
             width: 14px;
             height: 14px;
             background: var(--marker-colour);
             border: 2px solid #ffffff;
             border-radius: 50%;
             box-shadow:
-                0 0 0 3px rgba(7, 127, 156, 0.16),
-                0 3px 9px var(--marker-shadow);
+                0 0 0 0 rgba(7, 127, 156, 0.55),
+                0 2px 7px rgba(7, 127, 156, 0.45);
+            animation: marker-pulse 2.2s ease-out infinite;
+        }
+
+        /*
+         * Animated teal shadow.
+         */
+        @keyframes marker-pulse {
+            0% {
+                box-shadow:
+                    0 0 0 0 rgba(7, 127, 156, 0.55),
+                    0 2px 7px rgba(7, 127, 156, 0.45);
+            }
+
+            65% {
+                box-shadow:
+                    0 0 0 10px rgba(7, 127, 156, 0),
+                    0 3px 10px rgba(7, 127, 156, 0.35);
+            }
+
+            100% {
+                box-shadow:
+                    0 0 0 0 rgba(7, 127, 156, 0),
+                    0 2px 7px rgba(7, 127, 156, 0.45);
+            }
         }
 
         .leaflet-tooltip {
@@ -94,10 +121,9 @@
             color: #666666 !important;
         }
 
-        @media (max-width: 900px) {
-            #map {
-                height: 400px;
-                min-height: 400px;
+        @media (prefers-reduced-motion: reduce) {
+            .research-marker {
+                animation: none;
             }
         }
 
@@ -121,8 +147,15 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const EXPECTED_LOCATION_COUNT = 182;
+        const EXPECTED_DOT_COUNT = 182;
 
+        /*
+         * The published sheet must contain:
+         *
+         * Column A = City
+         * Column B = Country
+         * Column C = Dot count
+         */
         const csvUrl =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyTF3WaRtgKPHTVpnZwUPUyzMwq2_GkDu0-B0A1SvGiMZwGDGCCsu52XS-tf6Cc-LyF7VPWdkB7B43/pub?output=csv";
 
@@ -203,7 +236,12 @@
             "Barcelona": [41.3874, 2.1686],
             "Vila-seca": [41.1112, 1.1477],
             "Majadahonda": [40.4738, -3.8718],
+
+            /*
+             * Sabino Arana 5 is an address in Bilbao.
+             */
             "Bilbao": [43.263, -2.935],
+
             "Santiago de Compostela": [42.8782, -8.5448],
             "Pamplona": [42.8125, -1.6458],
             "Málaga": [36.7213, -4.4214],
@@ -226,8 +264,7 @@
         };
 
         /*
-         * Used whenever the spreadsheet row contains a country
-         * but no city.
+         * Used whenever column A is blank or cannot be matched.
          */
         const countryFallbacks = {
             "Argentina": [-38.4161, -63.6167],
@@ -291,7 +328,7 @@
         };
 
         /*
-         * Fixed starting position designed for a 400px-high world map.
+         * Starting view for a 400px-high map.
          */
         const STARTING_CENTER = [20, 5];
         const STARTING_ZOOM = 2;
@@ -465,10 +502,15 @@
                 .replace(/'/g, "&#039;");
         }
 
-        function createMarkerIcon() {
+        function createMarkerIcon(animationDelay) {
             return L.divIcon({
                 className: "",
-                html: '<div class="research-marker"></div>',
+                html: `
+                    <div
+                        class="research-marker"
+                        style="animation-delay:${animationDelay}s"
+                    ></div>
+                `,
                 iconSize: [14, 14],
                 iconAnchor: [7, 7],
                 tooltipAnchor: [0, -9]
@@ -489,7 +531,7 @@
             }
 
             /*
-             * Any row without a recognised city falls back to its country.
+             * When column A is blank, place the marker on the country.
              */
             if (country && countryFallbacks[country]) {
                 return {
@@ -502,8 +544,7 @@
         }
 
         /*
-         * Moves repeated markers into compact circular rings so every
-         * spreadsheet row remains visible as a separate dot.
+         * Moves dots sharing the same coordinates into circular rings.
          */
         function createOffsetCoordinates(
             coordinates,
@@ -516,22 +557,28 @@
             const originalLatitude = coordinates[0];
             const originalLongitude = coordinates[1];
 
-            const dotsPerRing = 8;
+            const firstRingCapacity = 8;
 
-            const ring =
-                Math.floor(
-                    (duplicateIndex - 1) / dotsPerRing
-                ) + 1;
+            let ring = 1;
+            let indexWithinRing = duplicateIndex - 1;
+            let ringCapacity = firstRingCapacity;
 
-            const positionInRing =
-                (duplicateIndex - 1) % dotsPerRing;
+            while (indexWithinRing >= ringCapacity) {
+                indexWithinRing -= ringCapacity;
+                ring++;
+                ringCapacity = firstRingCapacity * ring;
+            }
 
             const angle =
-                (positionInRing / dotsPerRing) *
+                (indexWithinRing / ringCapacity) *
                 Math.PI *
                 2;
 
-            const radius = 0.025 * ring;
+            /*
+             * The first ring is approximately 3 kilometres from
+             * the original location.
+             */
+            const radius = 0.028 * ring;
 
             const latitudeOffset =
                 Math.sin(angle) * radius;
@@ -555,6 +602,22 @@
                 originalLatitude + latitudeOffset,
                 originalLongitude + longitudeOffset
             ];
+        }
+
+        function parseDotCount(value) {
+            const parsedCount = Number.parseInt(
+                String(value || "").trim(),
+                10
+            );
+
+            if (
+                !Number.isFinite(parsedCount) ||
+                parsedCount < 1
+            ) {
+                return 0;
+            }
+
+            return parsedCount;
         }
 
         async function loadData() {
@@ -581,23 +644,51 @@
                 }
 
                 /*
-                 * The first row is treated as the spreadsheet header.
+                 * Skip the City, Country and # header row.
                  */
                 const dataRows = rows.slice(1);
 
-                const unmatchedLocations = [];
                 const coordinateCounts = new Map();
+                const unmatchedLocations = [];
+                const invalidCountRows = [];
 
-                let markerCount = 0;
+                let dotCount = 0;
 
                 dataRows.forEach((columns, rowIndex) => {
+                    const spreadsheetRow = rowIndex + 2;
+
+                    /*
+                     * Column A
+                     */
                     const rawCity = columns[0] || "";
+
+                    /*
+                     * Column B
+                     */
                     const rawCountry = columns[1] || "";
+
+                    /*
+                     * Column C
+                     */
+                    const numberOfDots = parseDotCount(
+                        columns[2]
+                    );
 
                     if (
                         !rawCity.trim() &&
                         !rawCountry.trim()
                     ) {
+                        return;
+                    }
+
+                    if (numberOfDots < 1) {
+                        invalidCountRows.push({
+                            row: spreadsheetRow,
+                            city: rawCity,
+                            country: rawCountry,
+                            value: columns[2]
+                        });
+
                         return;
                     }
 
@@ -608,66 +699,75 @@
 
                     if (!location) {
                         unmatchedLocations.push({
-                            row: rowIndex + 2,
+                            row: spreadsheetRow,
                             city: rawCity,
-                            country: rawCountry
+                            country: rawCountry,
+                            count: numberOfDots
                         });
 
                         return;
                     }
 
-                    const originalLatitude =
-                        location.coordinates[0];
-
-                    const originalLongitude =
-                        location.coordinates[1];
-
                     const coordinateKey =
-                        `${originalLatitude.toFixed(5)},` +
-                        `${originalLongitude.toFixed(5)}`;
+                        `${location.coordinates[0].toFixed(5)},` +
+                        `${location.coordinates[1].toFixed(5)}`;
 
-                    const duplicateIndex =
-                        coordinateCounts.get(
-                            coordinateKey
-                        ) || 0;
+                    /*
+                     * Create the number of dots specified in column C.
+                     */
+                    for (
+                        let localDotIndex = 0;
+                        localDotIndex < numberOfDots;
+                        localDotIndex++
+                    ) {
+                        const duplicateIndex =
+                            coordinateCounts.get(
+                                coordinateKey
+                            ) || 0;
 
-                    coordinateCounts.set(
-                        coordinateKey,
-                        duplicateIndex + 1
-                    );
-
-                    const displayedCoordinates =
-                        createOffsetCoordinates(
-                            location.coordinates,
-                            duplicateIndex
+                        coordinateCounts.set(
+                            coordinateKey,
+                            duplicateIndex + 1
                         );
 
-                    const marker = L.marker(
-                        displayedCoordinates,
-                        {
-                            icon: createMarkerIcon(),
-                            keyboard: true,
-                            title: location.label
-                        }
-                    );
+                        const displayedCoordinates =
+                            createOffsetCoordinates(
+                                location.coordinates,
+                                duplicateIndex
+                            );
 
-                    marker.bindTooltip(
-                        escapeHTML(location.label),
-                        {
-                            direction: "top",
-                            opacity: 1
-                        }
-                    );
+                        /*
+                         * Stagger the animation so every dot does not
+                         * pulsate at the exact same moment.
+                         */
+                        const animationDelay =
+                            -((dotCount % 12) * 0.16);
 
-                    marker.addTo(markerLayer);
-                    markerCount++;
+                        const marker = L.marker(
+                            displayedCoordinates,
+                            {
+                                icon: createMarkerIcon(
+                                    animationDelay
+                                ),
+                                keyboard: true,
+                                title: location.label
+                            }
+                        );
+
+                        marker.bindTooltip(
+                            escapeHTML(location.label),
+                            {
+                                direction: "top",
+                                opacity: 1
+                            }
+                        );
+
+                        marker.addTo(markerLayer);
+
+                        dotCount++;
+                    }
                 });
 
-                /*
-                 * Use a fixed starting world view rather than fitting the
-                 * bounds. This keeps the initial display consistent at
-                 * 400px high and closely matches the supplied screenshot.
-                 */
                 map.setView(
                     STARTING_CENTER,
                     STARTING_ZOOM,
@@ -677,29 +777,47 @@
                 );
 
                 console.info(
-                    `Research map created ${markerCount} markers.`
+                    `Research map created ${dotCount} dots using column C.`
                 );
 
-                if (markerCount === EXPECTED_LOCATION_COUNT) {
+                if (dotCount === EXPECTED_DOT_COUNT) {
                     console.info(
-                        `All ${EXPECTED_LOCATION_COUNT} expected locations were mapped successfully.`
+                        `All ${EXPECTED_DOT_COUNT} expected dots were mapped successfully.`
                     );
                 } else {
                     console.warn(
-                        `Expected ${EXPECTED_LOCATION_COUNT} markers, but ${markerCount} were created.`
+                        `Expected ${EXPECTED_DOT_COUNT} dots, but ${dotCount} were created.`
                     );
                 }
 
                 if (unmatchedLocations.length > 0) {
                     console.group(
-                        "Research map: locations that could not be mapped"
+                        "Locations that could not be mapped"
                     );
 
                     unmatchedLocations.forEach((location) => {
                         console.warn(
                             `Row ${location.row}: ` +
                             `${location.city || "(blank city)"}, ` +
-                            `${location.country || "(blank country)"}`
+                            `${location.country || "(blank country)"} — ` +
+                            `${location.count} dot(s)`
+                        );
+                    });
+
+                    console.groupEnd();
+                }
+
+                if (invalidCountRows.length > 0) {
+                    console.group(
+                        "Rows with an invalid column C dot count"
+                    );
+
+                    invalidCountRows.forEach((row) => {
+                        console.warn(
+                            `Row ${row.row}: ` +
+                            `${row.city || "(blank city)"}, ` +
+                            `${row.country || "(blank country)"} — ` +
+                            `column C value: ${row.value || "(blank)"}`
                         );
                     });
 
@@ -729,19 +847,6 @@
 
         window.addEventListener("resize", () => {
             map.invalidateSize();
-
-            /*
-             * Preserve the same world view after responsive resizing.
-             */
-            if (map.getZoom() < 1.5) {
-                map.setView(
-                    STARTING_CENTER,
-                    STARTING_ZOOM,
-                    {
-                        animate: false
-                    }
-                );
-            }
         });
     </script>
 </body>
