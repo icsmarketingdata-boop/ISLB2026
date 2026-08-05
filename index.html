@@ -50,66 +50,75 @@
         }
 
         /*
-         * Each spreadsheet dot.
+         * Leaflet icon wrapper.
+         *
+         * Overflow remains visible so repeated dots can be spread around
+         * the same geographic coordinate without changing the true location.
          */
+        .research-icon {
+            overflow: visible !important;
+            background: transparent !important;
+            border: 0 !important;
+        }
+
         .research-marker {
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 14px;
             height: 14px;
             background: var(--marker-colour);
             border: 2px solid #ffffff;
             border-radius: 50%;
             box-shadow:
-                0 0 0 0 rgba(7, 127, 156, 0.55),
-                0 2px 7px rgba(7, 127, 156, 0.45);
+                0 0 0 0 rgba(7, 127, 156, 0.58),
+                0 2px 8px rgba(7, 127, 156, 0.55);
             animation: marker-pulse 2.2s ease-out infinite;
+            cursor: pointer;
         }
 
-        /*
-         * Animated teal shadow.
-         */
         @keyframes marker-pulse {
             0% {
                 box-shadow:
-                    0 0 0 0 rgba(7, 127, 156, 0.55),
-                    0 2px 7px rgba(7, 127, 156, 0.45);
+                    0 0 0 0 rgba(7, 127, 156, 0.58),
+                    0 2px 8px rgba(7, 127, 156, 0.55);
             }
 
             65% {
                 box-shadow:
                     0 0 0 10px rgba(7, 127, 156, 0),
-                    0 3px 10px rgba(7, 127, 156, 0.35);
+                    0 3px 11px rgba(7, 127, 156, 0.42);
             }
 
             100% {
                 box-shadow:
                     0 0 0 0 rgba(7, 127, 156, 0),
-                    0 2px 7px rgba(7, 127, 156, 0.45);
+                    0 2px 8px rgba(7, 127, 156, 0.55);
             }
         }
 
         .leaflet-tooltip {
             padding: 8px 11px;
             background: #ffffff !important;
-            border: 1px solid rgba(7, 127, 156, 0.35) !important;
+            border: 1px solid rgba(7, 127, 156, 0.4) !important;
             border-radius: 8px;
             box-shadow:
                 0 0 0 2px rgba(7, 127, 156, 0.08),
-                0 6px 18px rgba(7, 127, 156, 0.24);
+                0 6px 18px rgba(7, 127, 156, 0.28);
             color: #231f20 !important;
             font-size: 13px;
             font-weight: 600;
         }
 
         .leaflet-tooltip-top::before {
-            border-top-color: rgba(7, 127, 156, 0.35) !important;
+            border-top-color: rgba(7, 127, 156, 0.4) !important;
         }
 
         .leaflet-control-zoom {
             overflow: hidden;
             border: 0 !important;
             border-radius: 10px !important;
-            box-shadow: 0 5px 16px rgba(7, 127, 156, 0.25) !important;
+            box-shadow: 0 5px 16px rgba(7, 127, 156, 0.3) !important;
         }
 
         .leaflet-control-zoom a {
@@ -117,7 +126,7 @@
         }
 
         .leaflet-control-attribution {
-            background: rgba(255, 255, 255, 0.88) !important;
+            background: rgba(255, 255, 255, 0.9) !important;
             color: #666666 !important;
         }
 
@@ -150,186 +159,554 @@
         const EXPECTED_DOT_COUNT = 182;
 
         /*
-         * The published sheet must contain:
+         * Embedded location data.
          *
-         * Column A = City
-         * Column B = Country
-         * Column C = Dot count
+         * Each count value determines how many individual dots are created.
+         * Blank-city spreadsheet records use the relevant country coordinates.
          */
-        const csvUrl =
-            "https://docs.google.com/spreadsheets/d/e/2PACX-1vQyTF3WaRtgKPHTVpnZwUPUyzMwq2_GkDu0-B0A1SvGiMZwGDGCCsu52XS-tf6Cc-LyF7VPWdkB7B43/pub?output=csv";
+        const locations = [
+            {
+                label: "C.A.B.A., Argentina",
+                lat: -34.6037,
+                lng: -58.3816,
+                count: 1
+            },
+            {
+                label: "Buenos Aires, Argentina",
+                lat: -34.6037,
+                lng: -58.3816,
+                count: 1
+            },
+            {
+                label: "Adelaide, Australia",
+                lat: -34.9285,
+                lng: 138.6007,
+                count: 1
+            },
+            {
+                label: "Antwerpen, Belgium",
+                lat: 51.2194,
+                lng: 4.4025,
+                count: 1
+            },
+            {
+                label: "Fortaleza, Brazil",
+                lat: -3.7319,
+                lng: -38.5267,
+                count: 2
+            },
+            {
+                label: "Varna, Bulgaria",
+                lat: 43.2141,
+                lng: 27.9147,
+                count: 1
+            },
+            {
+                label: "Canada",
+                lat: 56.1304,
+                lng: -106.3468,
+                count: 4
+            },
+            {
+                label: "Ottawa, Canada",
+                lat: 45.4215,
+                lng: -75.6972,
+                count: 1
+            },
+            {
+                label: "Toronto, Canada",
+                lat: 43.6532,
+                lng: -79.3832,
+                count: 1
+            },
+            {
+                label: "Montreal, Canada",
+                lat: 45.5019,
+                lng: -73.5674,
+                count: 5
+            },
+            {
+                label: "China",
+                lat: 35.8617,
+                lng: 104.1954,
+                count: 2
+            },
+            {
+                label: "Guangzhou, China",
+                lat: 23.1291,
+                lng: 113.2644,
+                count: 1
+            },
+            {
+                label: "Shenzhen, China",
+                lat: 22.5431,
+                lng: 114.0579,
+                count: 1
+            },
+            {
+                label: "Hangzhou, China",
+                lat: 30.2741,
+                lng: 120.1551,
+                count: 1
+            },
+            {
+                label: "Olomouc, Czech Republic",
+                lat: 49.5938,
+                lng: 17.2509,
+                count: 1
+            },
+            {
+                label: "Cairo, Egypt",
+                lat: 30.0444,
+                lng: 31.2357,
+                count: 1
+            },
+            {
+                label: "Egypt",
+                lat: 26.8206,
+                lng: 30.8025,
+                count: 1
+            },
+            {
+                label: "Toulouse, France",
+                lat: 43.6047,
+                lng: 1.4442,
+                count: 1
+            },
+            {
+                label: "Nice, France",
+                lat: 43.7102,
+                lng: 7.262,
+                count: 1
+            },
+            {
+                label: "France",
+                lat: 46.2276,
+                lng: 2.2137,
+                count: 1
+            },
+            {
+                label: "Germany",
+                lat: 51.1657,
+                lng: 10.4515,
+                count: 2
+            },
+            {
+                label: "Münster, Germany",
+                lat: 51.9607,
+                lng: 7.6261,
+                count: 1
+            },
+            {
+                label: "Hilden, Germany",
+                lat: 51.1679,
+                lng: 6.9307,
+                count: 2
+            },
+            {
+                label: "Athens, Greece",
+                lat: 37.9838,
+                lng: 23.7275,
+                count: 4
+            },
+            {
+                label: "Budapest, Hungary",
+                lat: 47.4979,
+                lng: 19.0402,
+                count: 1
+            },
+            {
+                label: "Chandigarh, India",
+                lat: 30.7333,
+                lng: 76.7794,
+                count: 3
+            },
+            {
+                label: "India",
+                lat: 20.5937,
+                lng: 78.9629,
+                count: 5
+            },
+            {
+                label: "Ahmedabad, India",
+                lat: 23.0225,
+                lng: 72.5714,
+                count: 1
+            },
+            {
+                label: "Chennai, India",
+                lat: 13.0827,
+                lng: 80.2707,
+                count: 2
+            },
+            {
+                label: "Bengaluru, India",
+                lat: 12.9716,
+                lng: 77.5946,
+                count: 1
+            },
+            {
+                label: "Mumbai, India",
+                lat: 19.076,
+                lng: 72.8777,
+                count: 2
+            },
+            {
+                label: "Binyamina, Israel",
+                lat: 32.518,
+                lng: 34.9458,
+                count: 1
+            },
+            {
+                label: "Naples, Italy",
+                lat: 40.8518,
+                lng: 14.2681,
+                count: 2
+            },
+            {
+                label: "Italy",
+                lat: 41.8719,
+                lng: 12.5674,
+                count: 16
+            },
+            {
+                label: "Bagnatica, Italy",
+                lat: 45.6602,
+                lng: 9.7817,
+                count: 1
+            },
+            {
+                label: "Cagliari, Italy",
+                lat: 39.2238,
+                lng: 9.1217,
+                count: 1
+            },
+            {
+                label: "Genova, Italy",
+                lat: 44.4056,
+                lng: 8.9463,
+                count: 2
+            },
+            {
+                label: "Biella, Italy",
+                lat: 45.5629,
+                lng: 8.0583,
+                count: 1
+            },
+            {
+                label: "Pisa, Italy",
+                lat: 43.7228,
+                lng: 10.4017,
+                count: 2
+            },
+            {
+                label: "Bologna, Italy",
+                lat: 44.4949,
+                lng: 11.3426,
+                count: 1
+            },
+            {
+                label: "Parma, Italy",
+                lat: 44.8015,
+                lng: 10.3279,
+                count: 2
+            },
+            {
+                label: "Bergamo, Italy",
+                lat: 45.6983,
+                lng: 9.6773,
+                count: 1
+            },
+            {
+                label: "Catania, Italy",
+                lat: 37.5079,
+                lng: 15.083,
+                count: 1
+            },
+            {
+                label: "Rome, Italy",
+                lat: 41.9028,
+                lng: 12.4964,
+                count: 3
+            },
+            {
+                label: "Milan, Italy",
+                lat: 45.4642,
+                lng: 9.19,
+                count: 1
+            },
+            {
+                label: "Bari, Italy",
+                lat: 41.1171,
+                lng: 16.8719,
+                count: 1
+            },
+            {
+                label: "Strassen, Luxembourg",
+                lat: 49.6206,
+                lng: 6.0733,
+                count: 1
+            },
+            {
+                label: "Mexico City, Mexico",
+                lat: 19.4326,
+                lng: -99.1332,
+                count: 1
+            },
+            {
+                label: "Mexico",
+                lat: 23.6345,
+                lng: -102.5528,
+                count: 1
+            },
+            {
+                label: "Rabat, Morocco",
+                lat: 34.0209,
+                lng: -6.8416,
+                count: 1
+            },
+            {
+                label: "Netherlands",
+                lat: 52.1326,
+                lng: 5.2913,
+                count: 1
+            },
+            {
+                label: "New Zealand",
+                lat: -40.9006,
+                lng: 174.886,
+                count: 1
+            },
+            {
+                label: "Obafemi-Owode, Nigeria",
+                lat: 6.9463,
+                lng: 3.505,
+                count: 1
+            },
+            {
+                label: "Porto, Portugal",
+                lat: 41.1579,
+                lng: -8.6291,
+                count: 1
+            },
+            {
+                label: "Daegu, Republic of Korea",
+                lat: 35.8714,
+                lng: 128.6014,
+                count: 2
+            },
+            {
+                label: "Seoul, Republic of Korea",
+                lat: 37.5665,
+                lng: 126.978,
+                count: 2
+            },
+            {
+                label: "Republic of Korea",
+                lat: 35.9078,
+                lng: 127.7669,
+                count: 3
+            },
+            {
+                label: "Singapore",
+                lat: 1.3521,
+                lng: 103.8198,
+                count: 1
+            },
+            {
+                label: "Slovenia",
+                lat: 46.1512,
+                lng: 14.9955,
+                count: 1
+            },
+            {
+                label: "Madrid, Spain",
+                lat: 40.4168,
+                lng: -3.7038,
+                count: 4
+            },
+            {
+                label: "Hernani, Spain",
+                lat: 43.2662,
+                lng: -1.9761,
+                count: 1
+            },
+            {
+                label: "Galapagar, Spain",
+                lat: 40.5783,
+                lng: -4.0043,
+                count: 1
+            },
+            {
+                label: "Spain",
+                lat: 40.4637,
+                lng: -3.7492,
+                count: 11
+            },
+            {
+                label: "Granada, Spain",
+                lat: 37.1773,
+                lng: -3.5986,
+                count: 2
+            },
+            {
+                label: "Valencia, Spain",
+                lat: 39.4699,
+                lng: -0.3763,
+                count: 5
+            },
+            {
+                label: "Barcelona, Spain",
+                lat: 41.3874,
+                lng: 2.1686,
+                count: 1
+            },
+            {
+                label: "Vila-seca, Spain",
+                lat: 41.1112,
+                lng: 1.1477,
+                count: 1
+            },
+            {
+                label: "Majadahonda, Spain",
+                lat: 40.4738,
+                lng: -3.8718,
+                count: 3
+            },
+            {
+                label: "Bilbao, Spain",
+                lat: 43.263,
+                lng: -2.935,
+                count: 2
+            },
+            {
+                label: "Santiago de Compostela, Spain",
+                lat: 42.8782,
+                lng: -8.5448,
+                count: 2
+            },
+            {
+                label: "Pamplona, Spain",
+                lat: 42.8125,
+                lng: -1.6458,
+                count: 1
+            },
+            {
+                label: "Málaga, Spain",
+                lat: 36.7213,
+                lng: -4.4214,
+                count: 1
+            },
+            {
+                label: "Sweden",
+                lat: 60.1282,
+                lng: 18.6435,
+                count: 1
+            },
+            {
+                label: "Turkey",
+                lat: 38.9637,
+                lng: 35.2433,
+                count: 1
+            },
+            {
+                label: "Belfast, United Kingdom",
+                lat: 54.5973,
+                lng: -5.9301,
+                count: 2
+            },
+            {
+                label: "United Kingdom",
+                lat: 55.3781,
+                lng: -3.436,
+                count: 4
+            },
+            {
+                label: "Cambridge, United Kingdom",
+                lat: 52.2053,
+                lng: 0.1218,
+                count: 3
+            },
+            {
+                label: "Colchester, United Kingdom",
+                lat: 51.8959,
+                lng: 0.8919,
+                count: 1
+            },
+            {
+                label: "London, United Kingdom",
+                lat: 51.5074,
+                lng: -0.1278,
+                count: 1
+            },
+            {
+                label: "New York, United States",
+                lat: 40.7128,
+                lng: -74.006,
+                count: 2
+            },
+            {
+                label: "United States",
+                lat: 39.8283,
+                lng: -98.5795,
+                count: 10
+            },
+            {
+                label: "Philadelphia, United States",
+                lat: 39.9526,
+                lng: -75.1652,
+                count: 1
+            },
+            {
+                label: "Boca Raton, United States",
+                lat: 26.3683,
+                lng: -80.1289,
+                count: 1
+            },
+            {
+                label: "West Los Angeles, United States",
+                lat: 34.0412,
+                lng: -118.4426,
+                count: 1
+            },
+            {
+                label: "Porter Ranch, United States",
+                lat: 34.2822,
+                lng: -118.5506,
+                count: 3
+            },
+            {
+                label: "Madison, United States",
+                lat: 43.0731,
+                lng: -89.4012,
+                count: 3
+            },
+            {
+                label: "Minneapolis, United States",
+                lat: 44.9778,
+                lng: -93.265,
+                count: 4
+            },
+            {
+                label: "Rochester, United States",
+                lat: 43.1566,
+                lng: -77.6088,
+                count: 1
+            },
+            {
+                label: "Chicago, United States",
+                lat: 41.8781,
+                lng: -87.6298,
+                count: 1
+            },
+            {
+                label: "Sparks, United States",
+                lat: 39.5349,
+                lng: -119.7527,
+                count: 1
+            }
+        ];
 
-        const hubs = {
-            "C.A.B.A.": [-34.6037, -58.3816],
-            "Buenos Aires": [-34.6037, -58.3816],
-
-            "Adelaide": [-34.9285, 138.6007],
-
-            "Antwerpen": [51.2194, 4.4025],
-
-            "Fortaleza": [-3.7319, -38.5267],
-
-            "Varna": [43.2141, 27.9147],
-
-            "Ottawa": [45.4215, -75.6972],
-            "Toronto": [43.6532, -79.3832],
-            "Montreal": [45.5019, -73.5674],
-
-            "Guangzhou": [23.1291, 113.2644],
-            "Shenzhen": [22.5431, 114.0579],
-            "Hangzhou": [30.2741, 120.1551],
-
-            "Olomouc": [49.5938, 17.2509],
-
-            "Cairo": [30.0444, 31.2357],
-
-            "Toulouse": [43.6047, 1.4442],
-            "Nice": [43.7102, 7.262],
-
-            "Münster": [51.9607, 7.6261],
-            "Hilden": [51.1679, 6.9307],
-
-            "Athens": [37.9838, 23.7275],
-
-            "Budapest": [47.4979, 19.0402],
-
-            "Chandigarh": [30.7333, 76.7794],
-            "Ahmedabad": [23.0225, 72.5714],
-            "Chennai": [13.0827, 80.2707],
-            "Bengaluru": [12.9716, 77.5946],
-            "Mumbai": [19.076, 72.8777],
-
-            "Binyamina": [32.518, 34.9458],
-
-            "Naples": [40.8518, 14.2681],
-            "Bagnatica": [45.6602, 9.7817],
-            "Cagliari": [39.2238, 9.1217],
-            "Genova": [44.4056, 8.9463],
-            "Biella": [45.5629, 8.0583],
-            "Pisa": [43.7228, 10.4017],
-            "Bologna": [44.4949, 11.3426],
-            "Parma": [44.8015, 10.3279],
-            "Bergamo": [45.6983, 9.6773],
-            "Catania": [37.5079, 15.083],
-            "Rome": [41.9028, 12.4964],
-            "Milan": [45.4642, 9.19],
-            "Bari": [41.1171, 16.8719],
-
-            "Strassen": [49.6206, 6.0733],
-
-            "Mexico City": [19.4326, -99.1332],
-
-            "Rabat": [34.0209, -6.8416],
-
-            "Obafemi-Owode": [6.9463, 3.505],
-
-            "Porto": [41.1579, -8.6291],
-
-            "Daegu": [35.8714, 128.6014],
-            "Seoul": [37.5665, 126.978],
-
-            "Madrid": [40.4168, -3.7038],
-            "Hernani": [43.2662, -1.9761],
-            "Galapagar": [40.5783, -4.0043],
-            "Granada": [37.1773, -3.5986],
-            "Valencia": [39.4699, -0.3763],
-            "Barcelona": [41.3874, 2.1686],
-            "Vila-seca": [41.1112, 1.1477],
-            "Majadahonda": [40.4738, -3.8718],
-
-            /*
-             * Sabino Arana 5 is an address in Bilbao.
-             */
-            "Bilbao": [43.263, -2.935],
-
-            "Santiago de Compostela": [42.8782, -8.5448],
-            "Pamplona": [42.8125, -1.6458],
-            "Málaga": [36.7213, -4.4214],
-
-            "Belfast": [54.5973, -5.9301],
-            "Cambridge": [52.2053, 0.1218],
-            "Colchester": [51.8959, 0.8919],
-            "London": [51.5074, -0.1278],
-
-            "New York": [40.7128, -74.006],
-            "Philadelphia": [39.9526, -75.1652],
-            "Boca Raton": [26.3683, -80.1289],
-            "West Los Angeles": [34.0412, -118.4426],
-            "Porter Ranch": [34.2822, -118.5506],
-            "Madison": [43.0731, -89.4012],
-            "Minneapolis": [44.9778, -93.265],
-            "Rochester": [43.1566, -77.6088],
-            "Chicago": [41.8781, -87.6298],
-            "Sparks": [39.5349, -119.7527]
-        };
-
-        /*
-         * Used whenever column A is blank or cannot be matched.
-         */
-        const countryFallbacks = {
-            "Argentina": [-38.4161, -63.6167],
-            "Australia": [-25.2744, 133.7751],
-            "Belgium": [50.5039, 4.4699],
-            "Brazil": [-14.235, -51.9253],
-            "Bulgaria": [42.7339, 25.4858],
-            "Canada": [56.1304, -106.3468],
-            "China": [35.8617, 104.1954],
-            "Czech Republic": [49.8175, 15.473],
-            "Egypt": [26.8206, 30.8025],
-            "France": [46.2276, 2.2137],
-            "Germany": [51.1657, 10.4515],
-            "Greece": [39.0742, 21.8243],
-            "Hungary": [47.1625, 19.5033],
-            "India": [20.5937, 78.9629],
-            "Israel": [31.0461, 34.8516],
-            "Italy": [41.8719, 12.5674],
-            "Luxembourg": [49.8153, 6.1296],
-            "Mexico": [23.6345, -102.5528],
-            "Morocco": [31.7917, -7.0926],
-            "Netherlands": [52.1326, 5.2913],
-            "New Zealand": [-40.9006, 174.886],
-            "Nigeria": [9.082, 8.6753],
-            "Portugal": [39.3999, -8.2245],
-            "Republic of Korea": [35.9078, 127.7669],
-            "Singapore": [1.3521, 103.8198],
-            "Slovenia": [46.1512, 14.9955],
-            "Spain": [40.4637, -3.7492],
-            "Sweden": [60.1282, 18.6435],
-            "Turkey": [38.9637, 35.2433],
-            "United Kingdom": [55.3781, -3.436],
-            "United States": [39.8283, -98.5795]
-        };
-
-        const cityAliases = {
-            "c a b a": "C.A.B.A.",
-            "capital federal": "C.A.B.A.",
-
-            "montreal": "Montreal",
-
-            "munster": "Münster",
-            "hilden": "Hilden",
-
-            "athens": "Athens",
-
-            "naples italy": "Naples",
-            "napoli": "Naples",
-            "cagliari": "Cagliari",
-            "milano": "Milan",
-            "roma": "Rome",
-
-            "hernani": "Hernani",
-            "valencia": "Valencia",
-            "vila seca": "Vila-seca",
-            "malaga": "Málaga",
-
-            "sabino arana 5": "Bilbao",
-
-            "west los angeles": "West Los Angeles"
-        };
-
-        /*
-         * Starting view for a 400px-high map.
-         */
         const STARTING_CENTER = [20, 5];
         const STARTING_ZOOM = 2;
 
@@ -357,142 +734,6 @@
 
         const markerLayer = L.layerGroup().addTo(map);
 
-        function normalizeLookupText(value) {
-            return String(value || "")
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .replace(/[’']/g, "")
-                .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, " ")
-                .replace(/\s+/g, " ")
-                .trim()
-                .toLowerCase();
-        }
-
-        function createCanonicalCityLookup() {
-            const lookup = {};
-
-            Object.keys(hubs).forEach((city) => {
-                lookup[normalizeLookupText(city)] = city;
-            });
-
-            return lookup;
-        }
-
-        const canonicalCityLookup = createCanonicalCityLookup();
-
-        function normalizeCountry(country) {
-            const cleaned = String(country || "")
-                .trim()
-                .replace(/\s+/g, " ");
-
-            const lookupKey = normalizeLookupText(cleaned);
-
-            const aliases = {
-                "republic of korea": "Republic of Korea",
-                "south korea": "Republic of Korea",
-                "korea republic of": "Republic of Korea",
-
-                "czechia": "Czech Republic",
-
-                "uk": "United Kingdom",
-                "u k": "United Kingdom",
-
-                "usa": "United States",
-                "u s a": "United States",
-                "united states of america": "United States"
-            };
-
-            return aliases[lookupKey] || cleaned;
-        }
-
-        function normalizeCity(city) {
-            const cleaned = String(city || "")
-                .trim()
-                .replace(/\s+/g, " ");
-
-            if (!cleaned) {
-                return "";
-            }
-
-            const lookupKey = normalizeLookupText(cleaned);
-
-            if (cityAliases[lookupKey]) {
-                return cityAliases[lookupKey];
-            }
-
-            if (canonicalCityLookup[lookupKey]) {
-                return canonicalCityLookup[lookupKey];
-            }
-
-            return cleaned;
-        }
-
-        function parseCSV(csvText) {
-            const rows = [];
-
-            let currentRow = [];
-            let currentValue = "";
-            let insideQuotes = false;
-
-            for (let index = 0; index < csvText.length; index++) {
-                const character = csvText[index];
-                const nextCharacter = csvText[index + 1];
-
-                if (
-                    character === '"' &&
-                    insideQuotes &&
-                    nextCharacter === '"'
-                ) {
-                    currentValue += '"';
-                    index++;
-                    continue;
-                }
-
-                if (character === '"') {
-                    insideQuotes = !insideQuotes;
-                    continue;
-                }
-
-                if (character === "," && !insideQuotes) {
-                    currentRow.push(currentValue.trim());
-                    currentValue = "";
-                    continue;
-                }
-
-                if (
-                    (character === "\n" || character === "\r") &&
-                    !insideQuotes
-                ) {
-                    if (
-                        character === "\r" &&
-                        nextCharacter === "\n"
-                    ) {
-                        index++;
-                    }
-
-                    currentRow.push(currentValue.trim());
-
-                    if (currentRow.some((cell) => cell !== "")) {
-                        rows.push(currentRow);
-                    }
-
-                    currentRow = [];
-                    currentValue = "";
-                    continue;
-                }
-
-                currentValue += character;
-            }
-
-            currentRow.push(currentValue.trim());
-
-            if (currentRow.some((cell) => cell !== "")) {
-                rows.push(currentRow);
-            }
-
-            return rows;
-        }
-
         function escapeHTML(value) {
             return String(value || "")
                 .replace(/&/g, "&amp;")
@@ -502,348 +743,158 @@
                 .replace(/'/g, "&#039;");
         }
 
-        function createMarkerIcon(animationDelay) {
+        /*
+         * Returns a pixel offset for dots sharing the same coordinate.
+         *
+         * The location remains geographically correct while individual
+         * dots are visually distributed in a compact spiral.
+         */
+        function getDotOffset(index) {
+            if (index === 0) {
+                return {
+                    x: 0,
+                    y: 0
+                };
+            }
+
+            const goldenAngle = 2.399963229728653;
+            const radius = 6.5 * Math.sqrt(index);
+            const angle = index * goldenAngle;
+
+            return {
+                x: Math.cos(angle) * radius,
+                y: Math.sin(angle) * radius
+            };
+        }
+
+        function createMarkerIcon(
+            offsetX,
+            offsetY,
+            animationDelay
+        ) {
+            const safeX = Number(offsetX.toFixed(2));
+            const safeY = Number(offsetY.toFixed(2));
+
             return L.divIcon({
-                className: "",
+                className: "research-icon",
                 html: `
                     <div
                         class="research-marker"
-                        style="animation-delay:${animationDelay}s"
+                        style="
+                            transform: translate(${safeX}px, ${safeY}px);
+                            animation-delay: ${animationDelay}s;
+                        "
                     ></div>
                 `,
                 iconSize: [14, 14],
                 iconAnchor: [7, 7],
-                tooltipAnchor: [0, -9]
+                tooltipAnchor: [
+                    safeX,
+                    safeY - 10
+                ]
             });
         }
 
-        function resolveLocation(rawCity, rawCountry) {
-            const city = normalizeCity(rawCity);
-            const country = normalizeCountry(rawCountry);
-
-            if (city && hubs[city]) {
-                return {
-                    coordinates: hubs[city],
-                    label: country
-                        ? `${city}, ${country}`
-                        : city
-                };
-            }
-
-            /*
-             * When column A is blank, place the marker on the country.
-             */
-            if (country && countryFallbacks[country]) {
-                return {
-                    coordinates: countryFallbacks[country],
-                    label: country
-                };
-            }
-
-            return null;
-        }
-
-        /*
-         * Moves dots sharing the same coordinates into circular rings.
-         */
-        function createOffsetCoordinates(
-            coordinates,
-            duplicateIndex
-        ) {
-            if (duplicateIndex === 0) {
-                return [...coordinates];
-            }
-
-            const originalLatitude = coordinates[0];
-            const originalLongitude = coordinates[1];
-
-            const firstRingCapacity = 8;
-
-            let ring = 1;
-            let indexWithinRing = duplicateIndex - 1;
-            let ringCapacity = firstRingCapacity;
-
-            while (indexWithinRing >= ringCapacity) {
-                indexWithinRing -= ringCapacity;
-                ring++;
-                ringCapacity = firstRingCapacity * ring;
-            }
-
-            const angle =
-                (indexWithinRing / ringCapacity) *
-                Math.PI *
-                2;
-
-            /*
-             * The first ring is approximately 3 kilometres from
-             * the original location.
-             */
-            const radius = 0.028 * ring;
-
-            const latitudeOffset =
-                Math.sin(angle) * radius;
-
-            const longitudeCorrection = Math.max(
-                Math.abs(
-                    Math.cos(
-                        originalLatitude *
-                        Math.PI /
-                        180
-                    )
-                ),
-                0.25
-            );
-
-            const longitudeOffset =
-                (Math.cos(angle) * radius) /
-                longitudeCorrection;
-
-            return [
-                originalLatitude + latitudeOffset,
-                originalLongitude + longitudeOffset
-            ];
-        }
-
-        function parseDotCount(value) {
-            const parsedCount = Number.parseInt(
-                String(value || "").trim(),
-                10
-            );
-
-            if (
-                !Number.isFinite(parsedCount) ||
-                parsedCount < 1
-            ) {
-                return 0;
-            }
-
-            return parsedCount;
-        }
-
-        async function loadData() {
+        function addEmbeddedMarkers() {
             markerLayer.clearLayers();
 
-            try {
-                const response = await fetch(csvUrl, {
-                    cache: "no-store"
-                });
+            /*
+             * Tracks every dot already positioned at each coordinate.
+             */
+            const coordinateCounts = new Map();
 
-                if (!response.ok) {
-                    throw new Error(
-                        `The spreadsheet returned status ${response.status}.`
+            let totalDots = 0;
+
+            locations.forEach((location) => {
+                const coordinateKey =
+                    `${location.lat.toFixed(5)},` +
+                    `${location.lng.toFixed(5)}`;
+
+                for (
+                    let localIndex = 0;
+                    localIndex < location.count;
+                    localIndex++
+                ) {
+                    const duplicateIndex =
+                        coordinateCounts.get(coordinateKey) || 0;
+
+                    coordinateCounts.set(
+                        coordinateKey,
+                        duplicateIndex + 1
                     );
-                }
 
-                const csvText = await response.text();
-                const rows = parseCSV(csvText);
-
-                if (rows.length < 2) {
-                    throw new Error(
-                        "The spreadsheet does not contain location rows."
-                    );
-                }
-
-                /*
-                 * Skip the City, Country and # header row.
-                 */
-                const dataRows = rows.slice(1);
-
-                const coordinateCounts = new Map();
-                const unmatchedLocations = [];
-                const invalidCountRows = [];
-
-                let dotCount = 0;
-
-                dataRows.forEach((columns, rowIndex) => {
-                    const spreadsheetRow = rowIndex + 2;
+                    const offset =
+                        getDotOffset(duplicateIndex);
 
                     /*
-                     * Column A
+                     * Stagger pulse animations so nearby dots do not all
+                     * expand at the same instant.
                      */
-                    const rawCity = columns[0] || "";
+                    const animationDelay =
+                        -((totalDots % 14) * 0.14);
 
-                    /*
-                     * Column B
-                     */
-                    const rawCountry = columns[1] || "";
-
-                    /*
-                     * Column C
-                     */
-                    const numberOfDots = parseDotCount(
-                        columns[2]
-                    );
-
-                    if (
-                        !rawCity.trim() &&
-                        !rawCountry.trim()
-                    ) {
-                        return;
-                    }
-
-                    if (numberOfDots < 1) {
-                        invalidCountRows.push({
-                            row: spreadsheetRow,
-                            city: rawCity,
-                            country: rawCountry,
-                            value: columns[2]
-                        });
-
-                        return;
-                    }
-
-                    const location = resolveLocation(
-                        rawCity,
-                        rawCountry
-                    );
-
-                    if (!location) {
-                        unmatchedLocations.push({
-                            row: spreadsheetRow,
-                            city: rawCity,
-                            country: rawCountry,
-                            count: numberOfDots
-                        });
-
-                        return;
-                    }
-
-                    const coordinateKey =
-                        `${location.coordinates[0].toFixed(5)},` +
-                        `${location.coordinates[1].toFixed(5)}`;
-
-                    /*
-                     * Create the number of dots specified in column C.
-                     */
-                    for (
-                        let localDotIndex = 0;
-                        localDotIndex < numberOfDots;
-                        localDotIndex++
-                    ) {
-                        const duplicateIndex =
-                            coordinateCounts.get(
-                                coordinateKey
-                            ) || 0;
-
-                        coordinateCounts.set(
-                            coordinateKey,
-                            duplicateIndex + 1
-                        );
-
-                        const displayedCoordinates =
-                            createOffsetCoordinates(
-                                location.coordinates,
-                                duplicateIndex
-                            );
-
-                        /*
-                         * Stagger the animation so every dot does not
-                         * pulsate at the exact same moment.
-                         */
-                        const animationDelay =
-                            -((dotCount % 12) * 0.16);
-
-                        const marker = L.marker(
-                            displayedCoordinates,
-                            {
-                                icon: createMarkerIcon(
-                                    animationDelay
-                                ),
-                                keyboard: true,
-                                title: location.label
-                            }
-                        );
-
-                        marker.bindTooltip(
-                            escapeHTML(location.label),
-                            {
-                                direction: "top",
-                                opacity: 1
-                            }
-                        );
-
-                        marker.addTo(markerLayer);
-
-                        dotCount++;
-                    }
-                });
-
-                map.setView(
-                    STARTING_CENTER,
-                    STARTING_ZOOM,
-                    {
-                        animate: false
-                    }
-                );
-
-                console.info(
-                    `Research map created ${dotCount} dots using column C.`
-                );
-
-                if (dotCount === EXPECTED_DOT_COUNT) {
-                    console.info(
-                        `All ${EXPECTED_DOT_COUNT} expected dots were mapped successfully.`
-                    );
-                } else {
-                    console.warn(
-                        `Expected ${EXPECTED_DOT_COUNT} dots, but ${dotCount} were created.`
-                    );
-                }
-
-                if (unmatchedLocations.length > 0) {
-                    console.group(
-                        "Locations that could not be mapped"
-                    );
-
-                    unmatchedLocations.forEach((location) => {
-                        console.warn(
-                            `Row ${location.row}: ` +
-                            `${location.city || "(blank city)"}, ` +
-                            `${location.country || "(blank country)"} — ` +
-                            `${location.count} dot(s)`
-                        );
-                    });
-
-                    console.groupEnd();
-                }
-
-                if (invalidCountRows.length > 0) {
-                    console.group(
-                        "Rows with an invalid column C dot count"
-                    );
-
-                    invalidCountRows.forEach((row) => {
-                        console.warn(
-                            `Row ${row.row}: ` +
-                            `${row.city || "(blank city)"}, ` +
-                            `${row.country || "(blank country)"} — ` +
-                            `column C value: ${row.value || "(blank)"}`
-                        );
-                    });
-
-                    console.groupEnd();
-                }
-            } catch (error) {
-                console.error(
-                    "Error loading research map data:",
-                    error
-                );
-            } finally {
-                window.setTimeout(() => {
-                    map.invalidateSize();
-
-                    map.setView(
-                        STARTING_CENTER,
-                        STARTING_ZOOM,
+                    const marker = L.marker(
+                        [location.lat, location.lng],
                         {
-                            animate: false
+                            icon: createMarkerIcon(
+                                offset.x,
+                                offset.y,
+                                animationDelay
+                            ),
+                            keyboard: true,
+                            title: location.label
                         }
                     );
-                }, 150);
+
+                    marker.bindTooltip(
+                        escapeHTML(location.label),
+                        {
+                            direction: "top",
+                            opacity: 1
+                        }
+                    );
+
+                    marker.addTo(markerLayer);
+                    totalDots++;
+                }
+            });
+
+            map.setView(
+                STARTING_CENTER,
+                STARTING_ZOOM,
+                {
+                    animate: false
+                }
+            );
+
+            console.info(
+                `Research map created ${totalDots} dots.`
+            );
+
+            if (totalDots === EXPECTED_DOT_COUNT) {
+                console.info(
+                    `All ${EXPECTED_DOT_COUNT} expected dots were added successfully.`
+                );
+            } else {
+                console.warn(
+                    `Expected ${EXPECTED_DOT_COUNT} dots, but ${totalDots} were added.`
+                );
             }
         }
 
-        loadData();
+        addEmbeddedMarkers();
+
+        window.setTimeout(() => {
+            map.invalidateSize();
+
+            map.setView(
+                STARTING_CENTER,
+                STARTING_ZOOM,
+                {
+                    animate: false
+                }
+            );
+        }, 150);
 
         window.addEventListener("resize", () => {
             map.invalidateSize();
