@@ -2,32 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>ICSES 2026 | Research Map</title>
+    <title>ISLB 2026 | Research Map</title>
 
-    <!-- Leaflet -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <!-- Leaflet marker clustering -->
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
-    >
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
-    >
-
     <style>
         :root {
-            --map-marker-colour: #077F9C;
+            --marker-colour: #077F9C;
         }
 
         * {
@@ -43,7 +33,11 @@
         }
 
         body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI",
+            font-family:
+                Inter,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
                 sans-serif;
         }
 
@@ -54,70 +48,15 @@
             background: #eef2f1;
         }
 
-        /*
-         * Individual location marker.
-         */
         .research-marker {
             width: 14px;
             height: 14px;
-            background: var(--map-marker-colour);
+            background: var(--marker-colour);
             border: 2px solid #ffffff;
             border-radius: 50%;
             box-shadow: 0 2px 7px rgba(0, 0, 0, 0.25);
         }
 
-        /*
-         * Cluster marker container.
-         */
-        .research-cluster {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-
-        /*
-         * Visible cluster circle.
-         */
-        .research-cluster-circle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background: var(--map-marker-colour);
-            border: 3px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            box-shadow:
-                0 0 0 5px rgba(7, 127, 156, 0.18),
-                0 3px 10px rgba(0, 0, 0, 0.2);
-            color: #ffffff;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        /*
-         * Slightly larger clusters.
-         */
-        .research-cluster.medium .research-cluster-circle {
-            width: 46px;
-            height: 46px;
-            box-shadow:
-                0 0 0 6px rgba(7, 127, 156, 0.2),
-                0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .research-cluster.large .research-cluster-circle {
-            width: 52px;
-            height: 52px;
-            box-shadow:
-                0 0 0 7px rgba(7, 127, 156, 0.22),
-                0 3px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /*
-         * Location tooltip.
-         */
         .leaflet-tooltip {
             padding: 8px 11px;
             background: #ffffff !important;
@@ -133,9 +72,6 @@
             border-top-color: rgba(7, 127, 156, 0.3) !important;
         }
 
-        /*
-         * Zoom controls.
-         */
         .leaflet-control-zoom {
             overflow: hidden;
             border: 0 !important;
@@ -144,21 +80,12 @@
         }
 
         .leaflet-control-zoom a {
-            color: #077F9C !important;
+            color: var(--marker-colour) !important;
         }
 
         .leaflet-control-attribution {
             background: rgba(255, 255, 255, 0.88) !important;
             color: #666666 !important;
-        }
-
-        /*
-         * Cluster expansion lines.
-         */
-        .leaflet-cluster-spider-leg {
-            stroke: #077F9C;
-            stroke-width: 1.5;
-            stroke-opacity: 0.65;
         }
 
         @media (max-width: 900px) {
@@ -182,11 +109,7 @@
         aria-label="Interactive map of research locations"
     ></div>
 
-    <!-- Leaflet -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <!-- Leaflet marker clustering -->
-    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
     <script>
         const csvUrl =
@@ -267,9 +190,6 @@
             "Sparks": [39.5349, -119.7527]
         };
 
-        /*
-         * Used when the spreadsheet includes a country but no city.
-         */
         const countryFallbacks = {
             "Canada": [56.1304, -106.3468],
             "China": [35.8617, 104.1954],
@@ -331,52 +251,7 @@
             }
         ).addTo(map);
 
-        /*
-         * Every spreadsheet row gets its own marker.
-         *
-         * Nearby markers are grouped into clusters. At the highest zoom,
-         * markers sharing the same coordinates expand into a spider layout.
-         */
-        const markerClusters = L.markerClusterGroup({
-            showCoverageOnHover: false,
-            zoomToBoundsOnClick: true,
-            spiderfyOnMaxZoom: true,
-            removeOutsideVisibleBounds: true,
-            animate: true,
-            maxClusterRadius: 45,
-
-            spiderfyDistanceMultiplier: 1.5,
-
-            iconCreateFunction(cluster) {
-                const count = cluster.getChildCount();
-
-                let sizeClass = "";
-
-                if (count >= 20) {
-                    sizeClass = "large";
-                } else if (count >= 10) {
-                    sizeClass = "medium";
-                }
-
-                const dimensions =
-                    count >= 20 ? 52 :
-                    count >= 10 ? 46 :
-                    40;
-
-                return L.divIcon({
-                    className: `research-cluster ${sizeClass}`,
-                    html: `
-                        <div class="research-cluster-circle">
-                            ${count}
-                        </div>
-                    `,
-                    iconSize: [dimensions, dimensions],
-                    iconAnchor: [dimensions / 2, dimensions / 2]
-                });
-            }
-        });
-
-        map.addLayer(markerClusters);
+        const markerLayer = L.layerGroup().addTo(map);
 
         function normalizeLookupText(value) {
             return String(value || "")
@@ -536,7 +411,9 @@
             if (city && hubs[city]) {
                 return {
                     coordinates: hubs[city],
-                    label: country ? `${city}, ${country}` : city
+                    label: country
+                        ? `${city}, ${country}`
+                        : city
                 };
             }
 
@@ -550,8 +427,65 @@
             return null;
         }
 
+        function createOffsetCoordinates(
+            coordinates,
+            duplicateIndex
+        ) {
+            if (duplicateIndex === 0) {
+                return coordinates;
+            }
+
+            const originalLatitude = coordinates[0];
+            const originalLongitude = coordinates[1];
+
+            /*
+             * Arrange repeated locations in expanding circular rings.
+             */
+            const dotsPerRing = 10;
+
+            const ring =
+                Math.floor(
+                    (duplicateIndex - 1) / dotsPerRing
+                ) + 1;
+
+            const positionInRing =
+                (duplicateIndex - 1) % dotsPerRing;
+
+            const angle =
+                (positionInRing / dotsPerRing) *
+                Math.PI *
+                2;
+
+            /*
+             * Approximate offset in geographic degrees.
+             * Increase this value to spread repeated dots farther apart.
+             */
+            const radius = 0.035 * ring;
+
+            const latitudeOffset =
+                Math.sin(angle) * radius;
+
+            const longitudeCorrection = Math.max(
+                Math.cos(
+                    originalLatitude *
+                    Math.PI /
+                    180
+                ),
+                0.25
+            );
+
+            const longitudeOffset =
+                (Math.cos(angle) * radius) /
+                longitudeCorrection;
+
+            return [
+                originalLatitude + latitudeOffset,
+                originalLongitude + longitudeOffset
+            ];
+        }
+
         async function loadData() {
-            markerClusters.clearLayers();
+            markerLayer.clearLayers();
 
             try {
                 const response = await fetch(csvUrl, {
@@ -573,18 +507,24 @@
                     );
                 }
 
-                /*
-                 * Skip the spreadsheet header row.
-                 */
                 const dataRows = rows.slice(1);
                 const mapBounds = [];
                 const unmatchedLocations = [];
+
+                /*
+                 * Tracks repeated coordinates so each record can be shown
+                 * as a separate dot.
+                 */
+                const coordinateCounts = new Map();
 
                 dataRows.forEach((columns) => {
                     const rawCity = columns[0] || "";
                     const rawCountry = columns[1] || "";
 
-                    if (!rawCity.trim() && !rawCountry.trim()) {
+                    if (
+                        !rawCity.trim() &&
+                        !rawCountry.trim()
+                    ) {
                         return;
                     }
 
@@ -602,15 +542,40 @@
                         return;
                     }
 
-                    /*
-                     * Each row receives its own marker, including duplicate
-                     * cities and locations sharing identical coordinates.
-                     */
-                    const marker = L.marker(location.coordinates, {
-                        icon: createMarkerIcon(),
-                        keyboard: true,
-                        title: location.label
-                    });
+                    const originalLatitude =
+                        location.coordinates[0];
+
+                    const originalLongitude =
+                        location.coordinates[1];
+
+                    const coordinateKey =
+                        `${originalLatitude.toFixed(5)},` +
+                        `${originalLongitude.toFixed(5)}`;
+
+                    const duplicateIndex =
+                        coordinateCounts.get(
+                            coordinateKey
+                        ) || 0;
+
+                    coordinateCounts.set(
+                        coordinateKey,
+                        duplicateIndex + 1
+                    );
+
+                    const displayedCoordinates =
+                        createOffsetCoordinates(
+                            location.coordinates,
+                            duplicateIndex
+                        );
+
+                    const marker = L.marker(
+                        displayedCoordinates,
+                        {
+                            icon: createMarkerIcon(),
+                            keyboard: true,
+                            title: location.label
+                        }
+                    );
 
                     marker.bindTooltip(
                         escapeHTML(location.label),
@@ -620,15 +585,18 @@
                         }
                     );
 
-                    markerClusters.addLayer(marker);
-                    mapBounds.push(location.coordinates);
+                    marker.addTo(markerLayer);
+                    mapBounds.push(displayedCoordinates);
                 });
 
                 if (mapBounds.length > 0) {
-                    map.fitBounds(L.latLngBounds(mapBounds), {
-                        padding: [30, 30],
-                        maxZoom: 4
-                    });
+                    map.fitBounds(
+                        L.latLngBounds(mapBounds),
+                        {
+                            padding: [30, 30],
+                            maxZoom: 4
+                        }
+                    );
                 }
 
                 if (unmatchedLocations.length > 0) {
@@ -636,12 +604,14 @@
                         "Research map: locations that could not be mapped"
                     );
 
-                    unmatchedLocations.forEach((location) => {
-                        console.warn(
-                            `${location.city || "(blank city)"}, ` +
-                            `${location.country || "(blank country)"}`
-                        );
-                    });
+                    unmatchedLocations.forEach(
+                        (location) => {
+                            console.warn(
+                                `${location.city || "(blank city)"}, ` +
+                                `${location.country || "(blank country)"}`
+                            );
+                        }
+                    );
 
                     console.groupEnd();
                 }
