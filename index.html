@@ -159,635 +159,577 @@
          * Named-city records remain at their specific city coordinates.
          */
         const locations = [
-            {
-                label: "C.A.B.A., Argentina",
-                lat: -34.6037,
-                lng: -58.3816,
-                count: 1
-            },
-            {
-                label: "Buenos Aires, Argentina",
-                lat: -34.6037,
-                lng: -58.3816,
-                count: 1
-            },
-            {
-                label: "Adelaide, Australia",
-                lat: -34.9285,
-                lng: 138.6007,
-                count: 1
-            },
-            {
-                label: "Antwerpen, Belgium",
-                lat: 51.2194,
-                lng: 4.4025,
-                count: 1
-            },
-            {
-                label: "Fortaleza, Brazil",
-                lat: -3.7319,
-                lng: -38.5267,
-                count: 2
-            },
-            {
-                label: "Varna, Bulgaria",
-                lat: 43.2141,
-                lng: 27.9147,
-                count: 1
-            },
+    {
+        label: "C.A.B.A., Argentina",
+        lat: -34.6037,
+        lng: -58.3816,
+        count: 1
+    },
+    {
+        label: "Buenos Aires, Argentina",
+        lat: -34.6037,
+        lng: -58.3816,
+        count: 1
+    },
+    {
+        label: "Adelaide, Australia",
+        lat: -34.9285,
+        lng: 138.6007,
+        count: 1
+    },
+    {
+        label: "Antwerpen, Belgium",
+        lat: 51.2194,
+        lng: 4.4025,
+        count: 1
+    },
+    {
+        label: "Fortaleza, Brazil",
+        lat: -3.7319,
+        lng: -38.5267,
+        count: 2
+    },
+    {
+        label: "Varna, Bulgaria",
+        lat: 43.2141,
+        lng: 27.9147,
+        count: 1
+    },
 
-            /*
-             * Blank-city Canada entries are placed at Ottawa.
-             */
-            {
-                label: "Canada",
-                lat: 45.4215,
-                lng: -75.6972,
-                count: 4
-            },
+    /*
+     Canada
+     Blank city records moved to Vancouver
+     */
+    {
+        label: "Vancouver, Canada",
+        lat: 49.2827,
+        lng: -123.1207,
+        count: 4
+    },
+    {
+        label: "Ottawa, Canada",
+        lat: 45.4215,
+        lng: -75.6972,
+        count: 1
+    },
+    {
+        label: "Toronto, Canada",
+        lat: 43.6532,
+        lng: -79.3832,
+        count: 1
+    },
+    {
+        label: "Montreal, Canada",
+        lat: 45.5019,
+        lng: -73.5674,
+        count: 4
+    },
 
-            {
-    label: "Canada, Vancouver",
-    lat: 49.2827,
-    lng: -123.1207,
-    count: 4
-},
-{
-    label: "Ottawa, Canada",
-    lat: 45.4215,
-    lng: -75.6972,
-    count: 1
-},
-{
-    label: "Toronto, Canada",
-    lat: 43.6532,
-    lng: -79.3832,
-    count: 1
-},
-{
-    label: "Montreal, Canada",
-    lat: 45.5019,
-    lng: -73.5674,
-    count: 4
-}
-            {
-                label: "Ottawa, Canada",
-                lat: 45.4215,
-                lng: -75.6972,
-                count: 1
-            },
-            {
-                label: "Toronto, Canada",
-                lat: 43.6532,
-                lng: -79.3832,
-                count: 1
-            },
+    {
+        label: "China (city not provided)",
+        lat: 39.9042,
+        lng: 116.4074,
+        count: 2
+    },
+    {
+        label: "Guangzhou, China",
+        lat: 23.1291,
+        lng: 113.2644,
+        count: 1
+    },
+    {
+        label: "Shenzhen, China",
+        lat: 22.5431,
+        lng: 114.0579,
+        count: 1
+    },
+    {
+        label: "Hangzhou, China",
+        lat: 30.2741,
+        lng: 120.1551,
+        count: 1
+    },
 
+    {
+        label: "Olomouc, Czech Republic",
+        lat: 49.5938,
+        lng: 17.2509,
+        count: 1
+    },
 
-            /*
-             * Blank-city China entries are placed at Beijing.
-             */
-            {
-                label: "China",
-                lat: 39.9042,
-                lng: 116.4074,
-                count: 2
-            },
-            {
-                label: "Guangzhou, China",
-                lat: 23.1291,
-                lng: 113.2644,
-                count: 1
-            },
-            {
-                label: "Shenzhen, China",
-                lat: 22.5431,
-                lng: 114.0579,
-                count: 1
-            },
-            {
-                label: "Hangzhou, China",
-                lat: 30.2741,
-                lng: 120.1551,
-                count: 1
-            },
-            {
-                label: "Olomouc, Czech Republic",
-                lat: 49.5938,
-                lng: 17.2509,
-                count: 1
-            },
-            {
-                label: "Cairo, Egypt",
-                lat: 30.0444,
-                lng: 31.2357,
-                count: 1
-            },
+    {
+        label: "Cairo, Egypt",
+        lat: 30.0444,
+        lng: 31.2357,
+        count: 1
+    },
+    {
+        label: "Egypt (city not provided)",
+        lat: 30.0444,
+        lng: 31.2357,
+        count: 1
+    },
 
-            /*
-             * Blank-city Egypt entry is placed at Cairo.
-             */
-            {
-                label: "Egypt",
-                lat: 30.0444,
-                lng: 31.2357,
-                count: 1
-            },
-            {
-                label: "Toulouse, France",
-                lat: 43.6047,
-                lng: 1.4442,
-                count: 1
-            },
-            {
-                label: "Nice, France",
-                lat: 43.7102,
-                lng: 7.262,
-                count: 1
-            },
+    {
+        label: "Toulouse, France",
+        lat: 43.6047,
+        lng: 1.4442,
+        count: 1
+    },
+    {
+        label: "Nice, France",
+        lat: 43.7102,
+        lng: 7.262,
+        count: 1
+    },
+    {
+        label: "France (city not provided)",
+        lat: 48.8566,
+        lng: 2.3522,
+        count: 1
+    },
 
-            /*
-             * Blank-city France entry is placed at Paris.
-             */
-            {
-                label: "France",
-                lat: 48.8566,
-                lng: 2.3522,
-                count: 1
-            },
+    {
+        label: "Germany (city not provided)",
+        lat: 52.5200,
+        lng: 13.4050,
+        count: 2
+    },
+    {
+        label: "Münster, Germany",
+        lat: 51.9607,
+        lng: 7.6261,
+        count: 1
+    },
+    {
+        label: "Hilden, Germany",
+        lat: 51.1679,
+        lng: 6.9307,
+        count: 2
+    },
 
-            /*
-             * Blank-city Germany entries are placed at Berlin.
-             */
-            {
-                label: "Germany",
-                lat: 52.52,
-                lng: 13.405,
-                count: 2
-            },
-            {
-                label: "Münster, Germany",
-                lat: 51.9607,
-                lng: 7.6261,
-                count: 1
-            },
-            {
-                label: "Hilden, Germany",
-                lat: 51.1679,
-                lng: 6.9307,
-                count: 2
-            },
-            {
-                label: "Athens, Greece",
-                lat: 37.9838,
-                lng: 23.7275,
-                count: 4
-            },
-            {
-                label: "Budapest, Hungary",
-                lat: 47.4979,
-                lng: 19.0402,
-                count: 1
-            },
-            {
-                label: "Chandigarh, India",
-                lat: 30.7333,
-                lng: 76.7794,
-                count: 3
-            },
+    {
+        label: "Athens, Greece",
+        lat: 37.9838,
+        lng: 23.7275,
+        count: 4
+    },
 
-            /*
-             * Blank-city India entries are placed at New Delhi.
-             */
-            {
-                label: "India",
-                lat: 28.6139,
-                lng: 77.209,
-                count: 5
-            },
-            {
-                label: "Ahmedabad, India",
-                lat: 23.0225,
-                lng: 72.5714,
-                count: 1
-            },
-            {
-                label: "Chennai, India",
-                lat: 13.0827,
-                lng: 80.2707,
-                count: 2
-            },
-            {
-                label: "Bengaluru, India",
-                lat: 12.9716,
-                lng: 77.5946,
-                count: 1
-            },
-            {
-                label: "Mumbai, India",
-                lat: 19.076,
-                lng: 72.8777,
-                count: 2
-            },
-            {
-                label: "Binyamina, Israel",
-                lat: 32.518,
-                lng: 34.9458,
-                count: 1
-            },
-            {
-                label: "Naples, Italy",
-                lat: 40.8518,
-                lng: 14.2681,
-                count: 2
-            },
+    {
+        label: "Budapest, Hungary",
+        lat: 47.4979,
+        lng: 19.0402,
+        count: 1
+    },
 
-            /*
-             * Blank-city Italy entries are placed at Rome.
-             */
-            {
-                label: "Italy",
-                lat: 41.9028,
-                lng: 12.4964,
-                count: 16
-            },
-            {
-                label: "Bagnatica, Italy",
-                lat: 45.6602,
-                lng: 9.7817,
-                count: 1
-            },
-            {
-                label: "Cagliari, Italy",
-                lat: 39.2238,
-                lng: 9.1217,
-                count: 1
-            },
-            {
-                label: "Genova, Italy",
-                lat: 44.4056,
-                lng: 8.9463,
-                count: 2
-            },
-            {
-                label: "Biella, Italy",
-                lat: 45.5629,
-                lng: 8.0583,
-                count: 1
-            },
-            {
-                label: "Pisa, Italy",
-                lat: 43.7228,
-                lng: 10.4017,
-                count: 2
-            },
-            {
-                label: "Bologna, Italy",
-                lat: 44.4949,
-                lng: 11.3426,
-                count: 1
-            },
-            {
-                label: "Parma, Italy",
-                lat: 44.8015,
-                lng: 10.3279,
-                count: 2
-            },
-            {
-                label: "Bergamo, Italy",
-                lat: 45.6983,
-                lng: 9.6773,
-                count: 1
-            },
-            {
-                label: "Catania, Italy",
-                lat: 37.5079,
-                lng: 15.083,
-                count: 1
-            },
-            {
-                label: "Rome, Italy",
-                lat: 41.9028,
-                lng: 12.4964,
-                count: 3
-            },
-            {
-                label: "Milan, Italy",
-                lat: 45.4642,
-                lng: 9.19,
-                count: 1
-            },
-            {
-                label: "Bari, Italy",
-                lat: 41.1171,
-                lng: 16.8719,
-                count: 1
-            },
-            {
-                label: "Strassen, Luxembourg",
-                lat: 49.6206,
-                lng: 6.0733,
-                count: 1
-            },
-            {
-                label: "Mexico City, Mexico",
-                lat: 19.4326,
-                lng: -99.1332,
-                count: 1
-            },
+    {
+        label: "Chandigarh, India",
+        lat: 30.7333,
+        lng: 76.7794,
+        count: 3
+    },
+    {
+        label: "India (city not provided)",
+        lat: 28.6139,
+        lng: 77.2090,
+        count: 5
+    },
+    {
+        label: "Ahmedabad, India",
+        lat: 23.0225,
+        lng: 72.5714,
+        count: 1
+    },
+    {
+        label: "Chennai, India",
+        lat: 13.0827,
+        lng: 80.2707,
+        count: 2
+    },
+    {
+        label: "Bengaluru, India",
+        lat: 12.9716,
+        lng: 77.5946,
+        count: 1
+    },
+    {
+        label: "Mumbai, India",
+        lat: 19.0760,
+        lng: 72.8777,
+        count: 2
+    },
 
-            /*
-             * Blank-city Mexico entry is placed at Mexico City.
-             */
-            {
-                label: "Mexico",
-                lat: 19.4326,
-                lng: -99.1332,
-                count: 1
-            },
-            {
-                label: "Rabat, Morocco",
-                lat: 34.0209,
-                lng: -6.8416,
-                count: 1
-            },
+    {
+        label: "Binyamina, Israel",
+        lat: 32.518,
+        lng: 34.9458,
+        count: 1
+    },
 
-            /*
-             * Blank-city Netherlands entry is placed at Amsterdam.
-             */
-            {
-                label: "Netherlands",
-                lat: 52.3676,
-                lng: 4.9041,
-                count: 1
-            },
+    {
+        label: "Naples, Italy",
+        lat: 40.8518,
+        lng: 14.2681,
+        count: 2
+    },
+    {
+        label: "Italy (city not provided)",
+        lat: 41.9028,
+        lng: 12.4964,
+        count: 16
+    },
+    {
+        label: "Bagnatica, Italy",
+        lat: 45.6602,
+        lng: 9.7817,
+        count: 1
+    },
+    {
+        label: "Cagliari, Italy",
+        lat: 39.2238,
+        lng: 9.1217,
+        count: 1
+    },
+    {
+        label: "Genova, Italy",
+        lat: 44.4056,
+        lng: 8.9463,
+        count: 2
+    },
+    {
+        label: "Biella, Italy",
+        lat: 45.5629,
+        lng: 8.0583,
+        count: 1
+    },
+    {
+        label: "Pisa, Italy",
+        lat: 43.7228,
+        lng: 10.4017,
+        count: 2
+    },
+    {
+        label: "Bologna, Italy",
+        lat: 44.4949,
+        lng: 11.3426,
+        count: 1
+    },
+    {
+        label: "Parma, Italy",
+        lat: 44.8015,
+        lng: 10.3279,
+        count: 2
+    },
+    {
+        label: "Bergamo, Italy",
+        lat: 45.6983,
+        lng: 9.6773,
+        count: 1
+    },
+    {
+        label: "Catania, Italy",
+        lat: 37.5079,
+        lng: 15.083,
+        count: 1
+    },
+    {
+        label: "Rome, Italy",
+        lat: 41.9028,
+        lng: 12.4964,
+        count: 3
+    },
+    {
+        label: "Milan, Italy",
+        lat: 45.4642,
+        lng: 9.1900,
+        count: 1
+    },
+    {
+        label: "Bari, Italy",
+        lat: 41.1171,
+        lng: 16.8719,
+        count: 1
+    },
 
-            /*
-             * Blank-city New Zealand entry is placed at Wellington.
-             */
-            {
-                label: "New Zealand",
-                lat: -41.2866,
-                lng: 174.7756,
-                count: 1
-            },
-            {
-                label: "Obafemi-Owode, Nigeria",
-                lat: 6.9463,
-                lng: 3.505,
-                count: 1
-            },
-            {
-                label: "Porto, Portugal",
-                lat: 41.1579,
-                lng: -8.6291,
-                count: 1
-            },
-            {
-                label: "Daegu, Republic of Korea",
-                lat: 35.8714,
-                lng: 128.6014,
-                count: 2
-            },
-            {
-                label: "Seoul, Republic of Korea",
-                lat: 37.5665,
-                lng: 126.978,
-                count: 2
-            },
+    {
+        label: "Strassen, Luxembourg",
+        lat: 49.6206,
+        lng: 6.0733,
+        count: 1
+    },
 
-            /*
-             * Blank-city Republic of Korea entries are placed at Seoul.
-             */
-            {
-                label: "Republic of Korea",
-                lat: 37.5665,
-                lng: 126.978,
-                count: 3
-            },
-            {
-                label: "Singapore",
-                lat: 1.3521,
-                lng: 103.8198,
-                count: 1
-            },
+    {
+        label: "Mexico City, Mexico",
+        lat: 19.4326,
+        lng: -99.1332,
+        count: 1
+    },
+    {
+        label: "Mexico (city not provided)",
+        lat: 19.4326,
+        lng: -99.1332,
+        count: 1
+    },
 
-            /*
-             * Blank-city Slovenia entry is placed at Ljubljana.
-             */
-            {
-                label: "Slovenia",
-                lat: 46.0569,
-                lng: 14.5058,
-                count: 1
-            },
-            {
-                label: "Madrid, Spain",
-                lat: 40.4168,
-                lng: -3.7038,
-                count: 4
-            },
-            {
-                label: "Hernani, Spain",
-                lat: 43.2662,
-                lng: -1.9761,
-                count: 1
-            },
-            {
-                label: "Galapagar, Spain",
-                lat: 40.5783,
-                lng: -4.0043,
-                count: 1
-            },
+    {
+        label: "Rabat, Morocco",
+        lat: 34.0209,
+        lng: -6.8416,
+        count: 1
+    },
 
-            /*
-             * Blank-city Spain entries are placed at Madrid.
-             */
-            {
-                label: "Spain",
-                lat: 40.4168,
-                lng: -3.7038,
-                count: 11
-            },
-            {
-                label: "Granada, Spain",
-                lat: 37.1773,
-                lng: -3.5986,
-                count: 2
-            },
-            {
-                label: "Valencia, Spain",
-                lat: 39.4699,
-                lng: -0.3763,
-                count: 5
-            },
-            {
-                label: "Barcelona, Spain",
-                lat: 41.3874,
-                lng: 2.1686,
-                count: 1
-            },
-            {
-                label: "Vila-seca, Spain",
-                lat: 41.1112,
-                lng: 1.1477,
-                count: 1
-            },
-            {
-                label: "Majadahonda, Spain",
-                lat: 40.4738,
-                lng: -3.8718,
-                count: 3
-            },
-            {
-                label: "Bilbao, Spain",
-                lat: 43.263,
-                lng: -2.935,
-                count: 2
-            },
-            {
-                label: "Santiago de Compostela, Spain",
-                lat: 42.8782,
-                lng: -8.5448,
-                count: 2
-            },
-            {
-                label: "Pamplona, Spain",
-                lat: 42.8125,
-                lng: -1.6458,
-                count: 1
-            },
-            {
-                label: "Málaga, Spain",
-                lat: 36.7213,
-                lng: -4.4214,
-                count: 1
-            },
+    {
+        label: "Netherlands (city not provided)",
+        lat: 52.3676,
+        lng: 4.9041,
+        count: 1
+    },
 
-            /*
-             * Blank-city Sweden entry is placed at Stockholm.
-             */
-            {
-                label: "Sweden",
-                lat: 59.3293,
-                lng: 18.0686,
-                count: 1
-            },
+    {
+        label: "New Zealand (city not provided)",
+        lat: -41.2866,
+        lng: 174.7756,
+        count: 1
+    },
 
-            /*
-             * Blank-city Turkey entry is placed at Ankara.
-             */
-            {
-                label: "Turkey",
-                lat: 39.9334,
-                lng: 32.8597,
-                count: 1
-            },
-            {
-                label: "Belfast, United Kingdom",
-                lat: 54.5973,
-                lng: -5.9301,
-                count: 2
-            },
+    {
+        label: "Obafemi-Owode, Nigeria",
+        lat: 6.9463,
+        lng: 3.5050,
+        count: 1
+    },
 
-            /*
-             * Blank-city United Kingdom entries are placed at London.
-             */
-            {
-                label: "United Kingdom",
-                lat: 51.5074,
-                lng: -0.1278,
-                count: 4
-            },
-            {
-                label: "Cambridge, United Kingdom",
-                lat: 52.2053,
-                lng: 0.1218,
-                count: 3
-            },
-            {
-                label: "Colchester, United Kingdom",
-                lat: 51.8959,
-                lng: 0.8919,
-                count: 1
-            },
-            {
-                label: "London, United Kingdom",
-                lat: 51.5074,
-                lng: -0.1278,
-                count: 1
-            },
-            {
-                label: "New York, United States",
-                lat: 40.7128,
-                lng: -74.006,
-                count: 2
-            },
+    {
+        label: "Porto, Portugal",
+        lat: 41.1579,
+        lng: -8.6291,
+        count: 1
+    },
 
-            /*
-             * Blank-city United States entries are placed at Washington, DC.
-             */
-            {
-                label: "United States",
-                lat: 38.9072,
-                lng: -77.0369,
-                count: 10
-            },
-            {
-                label: "Philadelphia, United States",
-                lat: 39.9526,
-                lng: -75.1652,
-                count: 1
-            },
-            {
-                label: "Boca Raton, United States",
-                lat: 26.3683,
-                lng: -80.1289,
-                count: 1
-            },
-            {
-                label: "West Los Angeles, United States",
-                lat: 34.0412,
-                lng: -118.4426,
-                count: 1
-            },
-            {
-                label: "Porter Ranch, United States",
-                lat: 34.2822,
-                lng: -118.5506,
-                count: 3
-            },
-            {
-                label: "Madison, United States",
-                lat: 43.0731,
-                lng: -89.4012,
-                count: 3
-            },
-            {
-                label: "Minneapolis, United States",
-                lat: 44.9778,
-                lng: -93.265,
-                count: 4
-            },
-            {
-                label: "Rochester, United States",
-                lat: 43.1566,
-                lng: -77.6088,
-                count: 1
-            },
-            {
-                label: "Chicago, United States",
-                lat: 41.8781,
-                lng: -87.6298,
-                count: 1
-            },
-            {
-                label: "Sparks, United States",
-                lat: 39.5349,
-                lng: -119.7527,
-                count: 1
-            }
-        ];
+    {
+        label: "Daegu, Republic of Korea",
+        lat: 35.8714,
+        lng: 128.6014,
+        count: 2
+    },
+    {
+        label: "Seoul, Republic of Korea",
+        lat: 37.5665,
+        lng: 126.9780,
+        count: 2
+    },
+    {
+        label: "Republic of Korea (city not provided)",
+        lat: 37.5665,
+        lng: 126.9780,
+        count: 3
+    },
+
+    {
+        label: "Singapore",
+        lat: 1.3521,
+        lng: 103.8198,
+        count: 1
+    },
+
+    {
+        label: "Slovenia (city not provided)",
+        lat: 46.0569,
+        lng: 14.5058,
+        count: 1
+    },
+
+    {
+        label: "Spain (city not provided)",
+        lat: 40.4168,
+        lng: -3.7038,
+        count: 11
+    },
+    {
+        label: "Madrid, Spain",
+        lat: 40.4168,
+        lng: -3.7038,
+        count: 4
+    },
+    {
+        label: "Hernani, Spain",
+        lat: 43.2662,
+        lng: -1.9761,
+        count: 1
+    },
+    {
+        label: "Galapagar, Spain",
+        lat: 40.5783,
+        lng: -4.0043,
+        count: 1
+    },
+    {
+        label: "Granada, Spain",
+        lat: 37.1773,
+        lng: -3.5986,
+        count: 2
+    },
+    {
+        label: "Valencia, Spain",
+        lat: 39.4699,
+        lng: -0.3763,
+        count: 5
+    },
+    {
+        label: "Barcelona, Spain",
+        lat: 41.3874,
+        lng: 2.1686,
+        count: 1
+    },
+    {
+        label: "Vila-seca, Spain",
+        lat: 41.1112,
+        lng: 1.1477,
+        count: 1
+    },
+    {
+        label: "Majadahonda, Spain",
+        lat: 40.4738,
+        lng: -3.8718,
+        count: 3
+    },
+    {
+        label: "Bilbao, Spain",
+        lat: 43.263,
+        lng: -2.935,
+        count: 2
+    },
+    {
+        label: "Santiago de Compostela, Spain",
+        lat: 42.8782,
+        lng: -8.5448,
+        count: 2
+    },
+    {
+        label: "Pamplona, Spain",
+        lat: 42.8125,
+        lng: -1.6458,
+        count: 1
+    },
+    {
+        label: "Málaga, Spain",
+        lat: 36.7213,
+        lng: -4.4214,
+        count: 1
+    },
+
+    {
+        label: "Sweden (city not provided)",
+        lat: 59.3293,
+        lng: 18.0686,
+        count: 1
+    },
+
+    {
+        label: "Turkey (city not provided)",
+        lat: 39.9334,
+        lng: 32.8597,
+        count: 1
+    },
+
+    {
+        label: "United Kingdom (city not provided)",
+        lat: 51.5074,
+        lng: -0.1278,
+        count: 4
+    },
+    {
+        label: "Belfast, United Kingdom",
+        lat: 54.5973,
+        lng: -5.9301,
+        count: 2
+    },
+    {
+        label: "Cambridge, United Kingdom",
+        lat: 52.2053,
+        lng: 0.1218,
+        count: 3
+    },
+    {
+        label: "Colchester, United Kingdom",
+        lat: 51.8959,
+        lng: 0.8919,
+        count: 1
+    },
+    {
+        label: "London, United Kingdom",
+        lat: 51.5074,
+        lng: -0.1278,
+        count: 1
+    },
+
+    {
+        label: "United States (city not provided)",
+        lat: 38.9072,
+        lng: -77.0369,
+        count: 10
+    },
+    {
+        label: "New York, United States",
+        lat: 40.7128,
+        lng: -74.0060,
+        count: 2
+    },
+    {
+        label: "Philadelphia, United States",
+        lat: 39.9526,
+        lng: -75.1652,
+        count: 1
+    },
+    {
+        label: "Boca Raton, United States",
+        lat: 26.3683,
+        lng: -80.1289,
+        count: 1
+    },
+    {
+        label: "West Los Angeles, United States",
+        lat: 34.0412,
+        lng: -118.4426,
+        count: 1
+    },
+    {
+        label: "Porter Ranch, United States",
+        lat: 34.2822,
+        lng: -118.5506,
+        count: 3
+    },
+    {
+        label: "Madison, United States",
+        lat: 43.0731,
+        lng: -89.4012,
+        count: 3
+    },
+    {
+        label: "Minneapolis, United States",
+        lat: 44.9778,
+        lng: -93.2650,
+        count: 4
+    },
+    {
+        label: "Rochester, United States",
+        lat: 43.1566,
+        lng: -77.6088,
+        count: 1
+    },
+    {
+        label: "Chicago, United States",
+        lat: 41.8781,
+        lng: -87.6298,
+        count: 1
+    },
+    {
+        label: "Sparks, United States",
+        lat: 39.5349,
+        lng: -119.7527,
+        count: 1
+    }
+];
 
         const STARTING_CENTER = [20, 5];
         const STARTING_ZOOM = 2;
